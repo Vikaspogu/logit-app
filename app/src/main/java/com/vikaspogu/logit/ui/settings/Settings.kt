@@ -52,6 +52,7 @@ fun Settings(navController: NavHostController, modifier: Modifier) {
         SettingColumn(
             contentPadding = innerPadding,
             modifier = modifier.fillMaxSize(),
+            navController
         )
     }
 }
@@ -60,11 +61,25 @@ fun Settings(navController: NavHostController, modifier: Modifier) {
 fun SettingColumn(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    navController: NavHostController,
 ) {
     LazyColumn(
         modifier = modifier, contentPadding = contentPadding
     ) {
         item {
+            Text(
+                modifier = Modifier
+                    .padding(16.dp),
+                text = stringResource(id = R.string.settings),
+                style = MaterialTheme.typography.displayMedium
+            )
+            SettingsBasicLinkItem(
+                title = R.string.manage_types,
+                icon = R.drawable.edit_vector_icon,
+                onClick = {
+                    navController.navigate(NavigationDestinations.Types.name)
+                }
+            )
             Text(
                 modifier = Modifier
                     .padding(16.dp),
@@ -76,6 +91,7 @@ fun SettingColumn(
                 icon = R.drawable.github_icon,
                 link = Constants.PROJECT_GITHUB_LINK
             )
+
         }
     }
 }

@@ -16,13 +16,14 @@ import com.vikaspogu.logit.ui.entry.EntriesViewModel
 import com.vikaspogu.logit.ui.home.SummaryScreen
 import com.vikaspogu.logit.ui.home.SummaryViewModel
 import com.vikaspogu.logit.ui.settings.Settings
+import com.vikaspogu.logit.ui.type.ManageType
+import com.vikaspogu.logit.ui.type.ManageTypeViewModel
 
 enum class NavigationDestinations() {
     Summary,
     Entries,
-    Add,
-    Edit,
-    Settings
+    Settings,
+    Types
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -58,6 +59,13 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
             composable(route = NavigationDestinations.Settings.name) {
                 Settings(
                     navController = navController,
+                    modifier
+                )
+            }
+            composable(route = NavigationDestinations.Types.name) {
+                ManageType(
+                    navController = navController,
+                    viewModel(factory = ManageTypeViewModel.factory),
                     modifier
                 )
             }

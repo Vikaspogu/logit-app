@@ -5,6 +5,7 @@ import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.text.format.DateFormat
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,7 @@ fun AddEditEntry(
     Scaffold(topBar = {
         TopBar(true, navController, NavigationDestinations.Entries)
     }) { innerPadding ->
-        AddForm(
+        AddEditForm(
             modifier = modifier
                 .padding(
                     start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
@@ -85,7 +86,7 @@ fun AddEditEntry(
 
 
 @Composable
-fun AddForm(
+fun AddEditForm(
     modifier: Modifier,
     navController: NavHostController,
     onValueChange: (AddEntry) -> Unit = {},
@@ -194,7 +195,7 @@ fun AddForm(
             viewModel
         )
         Spacer(Modifier.height(20.dp))
-        if (viewModel.action == Constants.ADD){
+        if (viewModel.action == Constants.ADD) {
             Button(onClick = {
                 coroutineScope.launch {
                     viewModel.saveEntry()
@@ -203,7 +204,7 @@ fun AddForm(
             }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
                 Text(text = "Save")
             }
-        }else if (viewModel.action == Constants.EDIT){
+        } else if (viewModel.action == Constants.EDIT) {
             Button(onClick = {
                 coroutineScope.launch {
                     viewModel.updateEntry()
@@ -251,7 +252,6 @@ fun Dropdown(
         )
 
         val filteredOptions = items.filter { it.type.contains(selectedVal, ignoreCase = true) }
-
         if (filteredOptions.isNotEmpty()) {
             ExposedDropdownMenu(
                 expanded = expanded,
@@ -278,7 +278,6 @@ fun Dropdown(
                     }
                 }
                 if (openDialog)
-
                     AlertDialog(
                         shape = RoundedCornerShape(25.dp),
                         onDismissRequest = { openDialog = false },
@@ -286,7 +285,7 @@ fun Dropdown(
                         text = {
                             OutlinedTextField(
                                 value = procedureType,
-                                onValueChange = { procedureType = it},
+                                onValueChange = { procedureType = it },
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = true,
                                 colors = OutlinedTextFieldDefaults.colors(
