@@ -41,6 +41,7 @@ import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.util.Constants
 import kotlinx.coroutines.launch
 
 @Composable
@@ -101,9 +102,9 @@ private fun EntriesCard(
         shape = MaterialTheme.shapes.large,
         onClick = {
             navController.navigate(
-                "edit/{entryId}".replace(
+                "addEdit/{action}/{entryId}".replace(
                     oldValue = "{entryId}", newValue = entry.entryId.toString()
-                )
+                ).replace(oldValue = "{action}", newValue = Constants.EDIT)
             )
         }) {
         Row(

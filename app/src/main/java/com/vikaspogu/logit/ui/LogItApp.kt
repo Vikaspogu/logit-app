@@ -9,10 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.vikaspogu.logit.ui.entry.AddEntry
+import com.vikaspogu.logit.ui.entry.AddEditEntry
 import com.vikaspogu.logit.ui.entry.AddEntryViewModel
-import com.vikaspogu.logit.ui.entry.EditEntry
-import com.vikaspogu.logit.ui.entry.EditEntryViewModel
 import com.vikaspogu.logit.ui.entry.EntriesScreen
 import com.vikaspogu.logit.ui.entry.EntriesViewModel
 import com.vikaspogu.logit.ui.home.SummaryScreen
@@ -43,13 +41,6 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
                     viewModel(factory = SummaryViewModel.factory)
                 )
             }
-            composable(route = NavigationDestinations.Add.name) {
-                AddEntry(
-                    navController = navController,
-                    viewModel(factory = AddEntryViewModel.factory),
-                    modifier
-                )
-            }
             composable(route = NavigationDestinations.Entries.name) {
                 EntriesScreen(
                     navController = navController,
@@ -57,10 +48,10 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
                     viewModel(factory = EntriesViewModel.factory),
                 )
             }
-            composable(route = "edit/{entryId}") {
-                EditEntry(
+            composable(route = "addEdit/{action}/{entryId}") {
+                AddEditEntry(
                     navController = navController,
-                    viewModel(factory = EditEntryViewModel.factory),
+                    viewModel(factory = AddEntryViewModel.factory),
                     modifier
                 )
             }

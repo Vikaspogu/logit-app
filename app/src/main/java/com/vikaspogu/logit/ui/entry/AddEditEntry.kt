@@ -54,12 +54,16 @@ import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.util.Constants
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
-fun AddEntry(navController: NavHostController, viewModel: AddEntryViewModel, modifier: Modifier) {
-
+fun AddEditEntry(
+    navController: NavHostController,
+    viewModel: AddEntryViewModel,
+    modifier: Modifier
+) {
     Scaffold(topBar = {
         TopBar(true, navController, NavigationDestinations.Entries)
     }) { innerPadding ->
@@ -93,7 +97,7 @@ fun AddForm(
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         modifier = modifier.padding(10.dp)
     ) {
         OutlinedTextField(
@@ -186,17 +190,30 @@ fun AddForm(
         Dropdown(
             items = typesUiState.types,
             label = "Procedure Type",
-            addEntry
+            addEntry,
+            viewModel
         )
         Spacer(Modifier.height(20.dp))
-        Button(onClick = {
-            coroutineScope.launch {
-                viewModel.saveEntry()
+        if (viewModel.action == Constants.ADD){
+            Button(onClick = {
+                coroutineScope.launch {
+                    viewModel.saveEntry()
+                }
+                navController.navigate(NavigationDestinations.Summary.name)
+            }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
+                Text(text = "Save")
             }
-            navController.navigate(NavigationDestinations.Summary.name)
-        }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Save")
+        }else if (viewModel.action == Constants.EDIT){
+            Button(onClick = {
+                coroutineScope.launch {
+                    viewModel.updateEntry()
+                }
+                navController.navigate(NavigationDestinations.Summary.name)
+            }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
+                Text(text = "Update")
+            }
         }
+
     }
 }
 
@@ -205,7 +222,8 @@ fun AddForm(
 fun Dropdown(
     items: List<Type>,
     label: String,
-    addEntry: AddEntry
+    addEntry: AddEntry,
+    viewModel: AddEntryViewModel
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
@@ -213,6 +231,9 @@ fun Dropdown(
         mutableStateOf("")
     }
     var openDialog by rememberSaveable { mutableStateOf(false) }
+    var procedureType by remember {
+        mutableStateOf("")
+    }
     val coroutineScope = rememberCoroutineScope()
 
     ExposedDropdownMenuBox(
@@ -257,14 +278,15 @@ fun Dropdown(
                     }
                 }
                 if (openDialog)
+
                     AlertDialog(
                         shape = RoundedCornerShape(25.dp),
                         onDismissRequest = { openDialog = false },
                         title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
                         text = {
                             OutlinedTextField(
-                                value = addEntry.notes,
-                                onValueChange = { },
+                                value = procedureType,
+                                onValueChange = { procedureType = it},
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = true,
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -280,8 +302,9 @@ fun Dropdown(
                                 shape = RoundedCornerShape(25.dp),
                                 onClick = {
                                     coroutineScope.launch {
-//                                        viewModel.deleteEntry(entry.entryId)
+                                        viewModel.addType(procedureType)
                                     }
+                                    openDialog = false
                                 },
                             ) {
                                 Text(

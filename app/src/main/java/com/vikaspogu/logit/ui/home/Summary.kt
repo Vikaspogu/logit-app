@@ -35,6 +35,7 @@ import com.vikaspogu.logit.data.model.Summary
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.util.Constants
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +51,7 @@ fun SummaryScreen(
             },
         )
     }, floatingActionButton = {
-        FloatingActionButton(onClick = { navController.navigate(NavigationDestinations.Add.name) }) {
+        FloatingActionButton(onClick = { navController.navigate("addEdit/{action}/0".replace(oldValue = "{action}", newValue = Constants.ADD)) }) {
             Icon(
                 imageVector = Icons.Default.Add, contentDescription = "Add"
             )

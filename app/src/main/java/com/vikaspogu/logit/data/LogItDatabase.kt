@@ -9,7 +9,7 @@ import com.vikaspogu.logit.data.dao.TypeDao
 import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.Type
 
-@Database(entities = [Entry::class, Type::class], version = 2)
+@Database(entities = [Entry::class, Type::class], version = 3)
 abstract class LogItDatabase : RoomDatabase() {
 
     abstract fun entryDao(): EntryDao
