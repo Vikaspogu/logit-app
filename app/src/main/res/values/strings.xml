@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">LogIt</string>
+    <string name="summary">Summary</string>
+    <string name="about">About</string>
+    <string name="expand_button_content_description">See more or less information.</string>
+    <string name="delete_confirmation_title">Delete entry?</string>
+    <string name="add_new_type_confirmation_title">Add new type</string>
+    <string name="delete_confirmation_message">Are you sure you want to delete the entry?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="project_on_github">https://github.com/vikaspogu</string>
+</resources>
