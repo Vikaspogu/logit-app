@@ -9,7 +9,7 @@ import com.vikaspogu.logit.data.dao.TypeDao
 import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.Type
 
-@Database(entities = [Entry::class, Type::class], version = 4, exportSchema = false)
+@Database(entities = [Entry::class, Type::class], version = 1, exportSchema = false)
 abstract class LogItDatabase : RoomDatabase() {
 
     abstract fun entryDao(): EntryDao
@@ -23,7 +23,7 @@ abstract class LogItDatabase : RoomDatabase() {
         fun getDatabase(context: Context): LogItDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, LogItDatabase::class.java, "logit_database")
-                    .fallbackToDestructiveMigration()
+                    .createFromAsset("database/logit_database.db")
                     .build()
                     .also { Instance = it }
             }
