@@ -57,7 +57,7 @@ fun TopBar(
                 }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(id = R.string.back)
                     )
                 }
             }

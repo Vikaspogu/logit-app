@@ -121,13 +121,13 @@ private fun EntriesCard(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column() {
+                    Column {
                         Text(
                             text = entry.type, style = MaterialTheme.typography.displayMedium
                         )
                         Row {
                             Text(
-                                text = "Date: ",
+                                text = stringResource(id = R.string.date).plus(": "),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             Text(
@@ -137,7 +137,7 @@ private fun EntriesCard(
                         }
                         Row {
                             Text(
-                                text = "Attending: ",
+                                text = stringResource(id = R.string.attending).plus(": "),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             Text(
@@ -147,7 +147,7 @@ private fun EntriesCard(
                         }
                         Row {
                             Text(
-                                text = "Patients age: ",
+                                text = stringResource(id = R.string.age).plus(": "),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             Text(
@@ -157,7 +157,7 @@ private fun EntriesCard(
                         }
                         Row {
                             Text(
-                                text = "Quantity: ",
+                                text = stringResource(id = R.string.quantity).plus(": "),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             Text(
@@ -167,7 +167,7 @@ private fun EntriesCard(
                         }
                         Row {
                             Text(
-                                text = "Notes: ",
+                                text = stringResource(id = R.string.notes).plus(": "),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             Text(
@@ -179,7 +179,7 @@ private fun EntriesCard(
                     Spacer(modifier = modifier.weight(1f))
                     IconButton(onClick = { openDialog = true }) {
                         Icon(
-                            imageVector = Icons.Outlined.Delete, contentDescription = "Delete"
+                            imageVector = Icons.Outlined.Delete, contentDescription = stringResource(id = R.string.delete)
                         )
                     }
                     if (openDialog)
@@ -202,6 +202,7 @@ private fun EntriesCard(
                                         coroutineScope.launch {
                                             viewModel.deleteEntry(entry.entryId)
                                         }
+                                        openDialog = false
                                     },
                                 ) {
                                     Text(

@@ -17,17 +17,17 @@ data class BottomNavigationItem(
     fun bottomNavigationItems(): List<BottomNavigationItem> {
         return listOf(
             BottomNavigationItem(
-                label = "Home",
+                label = NavigationDestinations.Summary.name,
                 icon = Icons.Filled.Home,
                 route = NavigationDestinations.Summary.name
             ),
             BottomNavigationItem(
-                label = "Entries",
+                label = NavigationDestinations.Entries.name,
                 icon = Icons.Filled.List,
                 route = NavigationDestinations.Entries.name
             ),
             BottomNavigationItem(
-                label = "Settings",
+                label = NavigationDestinations.Settings.name,
                 icon = Icons.Filled.Settings,
                 route = NavigationDestinations.Settings.name
             ),

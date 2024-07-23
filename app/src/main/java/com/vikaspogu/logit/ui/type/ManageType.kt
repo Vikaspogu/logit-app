@@ -1,6 +1,5 @@
 package com.vikaspogu.logit.ui.type
 
-import android.icu.util.Calendar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
@@ -50,7 +48,6 @@ import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
-import com.vikaspogu.logit.ui.util.Constants
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +93,7 @@ fun ManageType(
                         unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                         disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                     ),
-                    label = { Text(text = "Procedure Type") }
+                    label = { Text(text = stringResource(id = R.string.procedure_type)) }
                 )
             },
             confirmButton = {
@@ -182,7 +179,7 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
     }
     val coroutineScope = rememberCoroutineScope()
     Card(
-        modifier = modifier.padding(5.dp),
+        modifier = modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         shape = MaterialTheme.shapes.large,
     ) {

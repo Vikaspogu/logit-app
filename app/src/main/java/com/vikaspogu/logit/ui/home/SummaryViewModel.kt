@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class SummaryViewModel(private val entryRepository: EntryRepository) : ViewModel() {
+class SummaryViewModel(entryRepository: EntryRepository) : ViewModel() {
 
     val summaryUiState: StateFlow<SummaryUiState> = entryRepository.getSummary().map {
         SummaryUiState(it)

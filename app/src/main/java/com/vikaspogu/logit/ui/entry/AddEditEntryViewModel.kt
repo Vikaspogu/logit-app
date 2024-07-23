@@ -1,5 +1,6 @@
 package com.vikaspogu.logit.ui.entry
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,6 +32,12 @@ class AddEntryViewModel(
     private val typeRepository: TypeRepository
 ) : ViewModel() {
     var addEntryUiState by mutableStateOf(AddEntryUiState())
+    private val _selectedText = mutableStateOf("")
+    var selectedText: State<String> = _selectedText
+
+    fun updateSelectedText(text: String){
+        _selectedText.value = text
+    }
 
     val typeUiState: StateFlow<TypesUiState> =
         typeRepository.getAllTypes().map { TypesUiState(it) }.stateIn(

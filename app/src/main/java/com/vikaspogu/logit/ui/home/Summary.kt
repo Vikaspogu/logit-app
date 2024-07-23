@@ -53,7 +53,7 @@ fun SummaryScreen(
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navController.navigate("addEdit/{action}/0".replace(oldValue = "{action}", newValue = Constants.ADD)) }) {
             Icon(
-                imageVector = Icons.Default.Add, contentDescription = "Add"
+                imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.add)
             )
         }
     }, bottomBar = {

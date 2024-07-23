@@ -7,7 +7,7 @@ import com.vikaspogu.logit.data.repository.OfflineEntryRepository
 import com.vikaspogu.logit.data.repository.OfflineTypeRepository
 import com.vikaspogu.logit.data.repository.TypeRepository
 
-class LogItApplication() : Application() {
+class LogItApplication : Application() {
     val entryRepository: EntryRepository by lazy {
         OfflineEntryRepository(
             LogItDatabase.getDatabase(

@@ -5,7 +5,6 @@ import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.text.format.DateFormat
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -111,7 +111,7 @@ fun AddEditForm(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            label = { Text(text = "Attending") }
+            label = { Text(text = stringResource(R.string.attending)) }
         )
         OutlinedTextField(
             value = addEntry.age.toString(),
@@ -125,7 +125,7 @@ fun AddEditForm(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            label = { Text(text = "Age") }
+            label = { Text(text = stringResource(R.string.age)) }
         )
         OutlinedTextField(
             value = addEntry.quantity.toString(),
@@ -139,7 +139,7 @@ fun AddEditForm(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            label = { Text(text = "Quantity") }
+            label = { Text(text = stringResource(R.string.quantity)) }
         )
         OutlinedTextField(
             value = addEntry.notes,
@@ -151,7 +151,7 @@ fun AddEditForm(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            label = { Text(text = "Notes") }
+            label = { Text(text = stringResource(R.string.notes)) }
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -167,7 +167,7 @@ fun AddEditForm(
                     unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                     disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
-                label = { Text(text = "Date") },
+                label = { Text(text = stringResource(R.string.date)) },
                 trailingIcon = {
                     IconButton(onClick = {
                         showDatePicker(
@@ -180,7 +180,7 @@ fun AddEditForm(
                     }) {
                         Icon(
                             imageVector = Icons.Outlined.DateRange,
-                            contentDescription = "Date"
+                            contentDescription = stringResource(R.string.date)
                         )
                     }
                 }
@@ -190,7 +190,7 @@ fun AddEditForm(
         Spacer(Modifier.height(10.dp))
         Dropdown(
             items = typesUiState.types,
-            label = "Procedure Type",
+            label = stringResource(R.string.procedure_type),
             addEntry,
             viewModel
         )
@@ -202,7 +202,7 @@ fun AddEditForm(
                 }
                 navController.navigate(NavigationDestinations.Summary.name)
             }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Save")
+                Text(text = stringResource(id = R.string.save))
             }
         } else if (viewModel.action == Constants.EDIT) {
             Button(onClick = {
@@ -211,7 +211,7 @@ fun AddEditForm(
                 }
                 navController.navigate(NavigationDestinations.Summary.name)
             }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Update")
+                Text(text = stringResource(id = R.string.update))
             }
         }
 
@@ -228,14 +228,19 @@ fun Dropdown(
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
-    var selectedVal by remember {
-        mutableStateOf("")
-    }
     var openDialog by rememberSaveable { mutableStateOf(false) }
     var procedureType by remember {
         mutableStateOf("")
     }
+
     val coroutineScope = rememberCoroutineScope()
+
+    val editType = items.find { it.id == addEntry.typeId }
+    if(editType?.type?.isNotEmpty() == true){
+        LaunchedEffect(viewModel.selectedText) {
+            viewModel.updateSelectedText(editType.type)
+        }
+    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -245,13 +250,13 @@ fun Dropdown(
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth(),
-            value = selectedVal,
+            value = viewModel.selectedText.value,
             label = { Text(text = label) },
-            onValueChange = { selectedVal = it },
+            onValueChange = { viewModel.updateSelectedText(it) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )
 
-        val filteredOptions = items.filter { it.type.contains(selectedVal, ignoreCase = true) }
+        val filteredOptions = items.filter { it.type.contains(viewModel.selectedText.value, ignoreCase = true) }
         if (filteredOptions.isNotEmpty()) {
             ExposedDropdownMenu(
                 expanded = expanded,
@@ -262,7 +267,7 @@ fun Dropdown(
                         text = { Text(item.type) },
                         onClick = {
                             addEntry.typeId = item.id
-                            selectedVal = item.type
+                            viewModel.updateSelectedText(item.type)
                             expanded = false
                             Toast.makeText(context, item.type, Toast.LENGTH_SHORT).show()
                         },
@@ -273,8 +278,10 @@ fun Dropdown(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        Icon(imageVector = Icons.Outlined.Add, contentDescription = "add")
-                        Text(text = "Add new Type")
+                        Icon(imageVector = Icons.Outlined.Add, contentDescription = stringResource(
+                            id = R.string.add
+                        ))
+                        Text(text = stringResource(R.string.add_new_type_confirmation_title))
                     }
                 }
                 if (openDialog)
@@ -293,7 +300,7 @@ fun Dropdown(
                                     unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                                     disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 ),
-                                label = { Text(text = "Procedure Type") }
+                                label = { Text(text = stringResource(id = R.string.procedure_type)) }
                             )
                         },
                         confirmButton = {

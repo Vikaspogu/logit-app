@@ -19,7 +19,7 @@ import com.vikaspogu.logit.ui.settings.Settings
 import com.vikaspogu.logit.ui.type.ManageType
 import com.vikaspogu.logit.ui.type.ManageTypeViewModel
 
-enum class NavigationDestinations() {
+enum class NavigationDestinations {
     Summary,
     Entries,
     Settings,
