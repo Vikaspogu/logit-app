@@ -15,3 +15,19 @@
 [<img src="./docs/images/github-release.png"
     alt="Get it on GitHub"
     height="80">](https://github.com/Vikaspogu/logit-app/releases/latest)
+
+## Technologies
+- 100% Kotlin.
+- Made Using Jetpack Compose.
+- Following Clean Architecture approach.
+- Following MVVM Architectural Design Pattern.
+- 
+### Used in the app :
+- Room DB
+- Kotlin coroutines
+- Kotlin Flows
+- Jetpack Compose
+
+## 🤝 Gratitude and Thanks
+
+Thanks to [mhss1/MyBrain](https://github.com/mhss1/MyBrain) app for lots of inspirations
