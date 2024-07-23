@@ -45,7 +45,12 @@ jobs:
         BUILD_TOOLS_VERSION: "34.0.0"
 
     # Example use of `signedReleaseFile` output -- not needed
-    - uses: actions/upload-artifact@v2
+    - name: Upload APK to GitHub Releases
+      uses: ncipollo/release-action@v1
       with:
-        name: Signed app bundle
-        path: ${{steps.sign_app.outputs.signedReleaseFile}}
+        artifacts: ${{steps.sign_app.outputs.signedReleaseFile}}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ github.ref }}
+        name: Release ${{ github.ref_name }}
+        body: |
+          Release of version ${{ github.ref_name }}.
