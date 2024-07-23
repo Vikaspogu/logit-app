@@ -31,7 +31,12 @@ jobs:
     - name: Build Release AAB
       run: ./gradlew bundleRelease
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload APK to GitHub Releases
+      uses: ncipollo/release-action@v1
       with:
-        name: Upload APK to GitHub Releases
         path: app/build/outputs/apk/release/*.apk
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ github.ref }}
+        name: Release ${{ github.ref_name }}
+        body: |
+          Release of version ${{ github.ref_name }}.
