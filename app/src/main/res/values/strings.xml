@@ -22,4 +22,5 @@
     <string name="procedure_type">Procedure Type</string>
     <string name="attending">Attending</string>
     <string name="age">Age</string>
+    <string name="app_version">App version</string>
 </resources>

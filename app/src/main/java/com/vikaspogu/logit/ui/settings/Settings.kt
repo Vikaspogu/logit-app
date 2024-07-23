@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.vikaspogu.logit.BuildConfig
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
@@ -80,6 +81,8 @@ fun SettingColumn(
                     navController.navigate(NavigationDestinations.Types.name)
                 }
             )
+        }
+        item {
             Text(
                 modifier = Modifier
                     .padding(16.dp),
@@ -91,7 +94,14 @@ fun SettingColumn(
                 icon = R.drawable.github_icon,
                 link = Constants.PROJECT_GITHUB_LINK
             )
-
+        }
+        item {
+            SettingsBasicLinkItem(
+                title = R.string.app_version,
+                icon = R.drawable.ic_code,
+                subtitle = BuildConfig.VERSION_NAME,
+                link = Constants.GITHUB_RELEASES_LINK
+            )
         }
     }
 }
