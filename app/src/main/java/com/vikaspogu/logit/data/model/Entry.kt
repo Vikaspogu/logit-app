@@ -25,6 +25,6 @@ data class Entry(
     val attendingName: String,
     @ColumnInfo(name = "entry_date")
     val entryDate: Long = 0L,
-    @ColumnInfo(name = "type_id")
+    @ColumnInfo(name = "type_id", index = true)
     val typeId: Int,
 )

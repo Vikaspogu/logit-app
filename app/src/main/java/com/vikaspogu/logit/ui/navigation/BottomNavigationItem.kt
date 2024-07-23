@@ -1,6 +1,7 @@
 package com.vikaspogu.logit.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
@@ -23,7 +24,7 @@ data class BottomNavigationItem(
             ),
             BottomNavigationItem(
                 label = NavigationDestinations.Entries.name,
-                icon = Icons.Filled.List,
+                icon = Icons.AutoMirrored.Filled.List,
                 route = NavigationDestinations.Entries.name
             ),
             BottomNavigationItem(
