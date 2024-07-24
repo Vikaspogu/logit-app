@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -160,7 +161,7 @@ fun SummaryCard(summary: Summary, modifier: Modifier, viewModel: SummaryViewMode
             ModalBottomSheet(
                 onDismissRequest = {
                     showBottomSheet = !showBottomSheet
-                },
+                }
             ) {
                 EntriesType(entryList = typeUiState.entryTypeList, modifier = modifier)
             }
@@ -193,7 +194,7 @@ fun EntriesType(entryList: List<Entry>, modifier: Modifier) {
 
 @Composable
 fun EntryTypeDetails(entryList: List<Entry>, modifier: Modifier) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
+    Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
         Text(
             modifier = Modifier
                 .padding(16.dp),
@@ -217,75 +218,54 @@ fun EntryTypeCard(entry: Entry, modifier: Modifier) {
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         shape = MaterialTheme.shapes.large
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
             Column(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Row {
-                            Text(
-                                text = stringResource(id = R.string.date).plus(": "),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = entry.entryDate.formatDate(),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Row {
-                            Text(
-                                text = stringResource(id = R.string.attending).plus(": "),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = entry.attendingName,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Row {
-                            Text(
-                                text = stringResource(id = R.string.age).plus(": "),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = entry.age.toString(),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Row {
-                            Text(
-                                text = stringResource(id = R.string.quantity).plus(": "),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = entry.quantity.toString(),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Row {
-                            Text(
-                                text = stringResource(id = R.string.notes).plus(": "),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = entry.notes, style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-
-                    }
-                }
+                Text(
+                    text = stringResource(id = R.string.date),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = entry.entryDate.formatDate(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(id = R.string.attending),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = entry.attendingName,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(id = R.string.age),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = entry.age.toString(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(id = R.string.quantity),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = entry.quantity.toString(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(id = R.string.notes),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = entry.notes, style = MaterialTheme.typography.bodyMedium
+                )
             }
-        }
-
     }
 }

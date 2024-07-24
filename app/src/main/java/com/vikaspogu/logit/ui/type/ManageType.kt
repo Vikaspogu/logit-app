@@ -1,5 +1,6 @@
 package com.vikaspogu.logit.ui.type
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -182,6 +184,7 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
         mutableStateOf(type.type)
     }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     Card(
         modifier = modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
@@ -208,7 +211,11 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                 }
                 IconButton(onClick = {
                     coroutineScope.launch {
-                        viewModel.deleteType(type.id)
+                        try {
+                            viewModel.deleteType(type.id)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Procedure Type cannot be deleted.", Toast.LENGTH_LONG).show()
+                        }
                     }
                 }) {
                     Icon(
