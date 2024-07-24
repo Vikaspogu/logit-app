@@ -20,24 +20,33 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
+import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.Summary
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.entry.formatDate
 import com.vikaspogu.logit.ui.util.Constants
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +83,8 @@ fun SummaryScreen(
                 summaryList = summaryUiState.summaryList,
                 contentPadding = innerPadding,
                 modifier = modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                viewModel
             )
         } else {
             EmptySummary(modifier = modifier)
@@ -84,12 +94,17 @@ fun SummaryScreen(
 }
 
 @Composable
-fun SummaryList(summaryList: List<Summary>, contentPadding: PaddingValues, modifier: Modifier) {
+fun SummaryList(
+    summaryList: List<Summary>,
+    contentPadding: PaddingValues,
+    modifier: Modifier,
+    viewModel: SummaryViewModel
+) {
     LazyColumn(
         modifier = modifier, contentPadding = contentPadding
     ) {
         item {
-            SummaryDetails(summaryList, modifier)
+            SummaryDetails(summaryList, modifier, viewModel)
         }
     }
 }
@@ -107,7 +122,7 @@ fun EmptySummary(modifier: Modifier) {
 }
 
 @Composable
-fun SummaryDetails(summaryList: List<Summary>, modifier: Modifier) {
+fun SummaryDetails(summaryList: List<Summary>, modifier: Modifier, viewModel: SummaryViewModel) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
         Text(
             modifier = Modifier
@@ -117,7 +132,77 @@ fun SummaryDetails(summaryList: List<Summary>, modifier: Modifier) {
         )
         for (summary in summaryList) {
             SummaryCard(
-                summary, modifier
+                summary, modifier, viewModel
+            )
+        }
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SummaryCard(summary: Summary, modifier: Modifier, viewModel: SummaryViewModel) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val typeUiState by viewModel.entryTypeUiState.collectAsState()
+    Card(
+        modifier = modifier.padding(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        shape = MaterialTheme.shapes.large,
+        onClick = {
+            showBottomSheet = true
+            coroutineScope.launch {
+                viewModel.getEntriesByType(summary.typeId)
+            }
+        }
+    ) {
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = !showBottomSheet
+                },
+            ) {
+                EntriesType(entryList = typeUiState.entryTypeList, modifier = modifier)
+            }
+        }
+        Row(
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement  =  Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = summary.type,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = modifier.weight(1f)
+            )
+            Text(
+                text = summary.total.toString(), style = MaterialTheme.typography.headlineSmall
+            )
+        }
+    }
+}
+
+@Composable
+fun EntriesType(entryList: List<Entry>, modifier: Modifier) {
+    LazyColumn {
+        item {
+            EntryTypeDetails(entryList, modifier)
+        }
+    }
+}
+
+@Composable
+fun EntryTypeDetails(entryList: List<Entry>, modifier: Modifier) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
+        Text(
+            modifier = Modifier
+                .padding(16.dp),
+            text = stringResource(id = R.string.history),
+            style = MaterialTheme.typography.headlineMedium
+        )
+        for (entry in entryList) {
+            EntryTypeCard(
+                entry, modifier
             )
         }
         Spacer(Modifier.height(16.dp))
@@ -125,28 +210,82 @@ fun SummaryDetails(summaryList: List<Summary>, modifier: Modifier) {
 }
 
 @Composable
-fun SummaryCard(summary: Summary, modifier: Modifier) {
+fun EntryTypeCard(entry: Entry, modifier: Modifier) {
     Card(
-        modifier = modifier.padding(10.dp),
+        modifier = modifier
+            .padding(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.large
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
             ) {
-                Text(
-                    text = summary.type,
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = summary.total.toString(), style = MaterialTheme.typography.headlineSmall
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Row {
+                            Text(
+                                text = stringResource(id = R.string.date).plus(": "),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = entry.entryDate.formatDate(),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Row {
+                            Text(
+                                text = stringResource(id = R.string.attending).plus(": "),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = entry.attendingName,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Row {
+                            Text(
+                                text = stringResource(id = R.string.age).plus(": "),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = entry.age.toString(),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Row {
+                            Text(
+                                text = stringResource(id = R.string.quantity).plus(": "),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = entry.quantity.toString(),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Row {
+                            Text(
+                                text = stringResource(id = R.string.notes).plus(": "),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = entry.notes, style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+                    }
+                }
             }
         }
+
     }
 }

@@ -72,59 +72,63 @@ fun ManageType(
             },
         )
     }, floatingActionButton = {
-        FloatingActionButton(onClick = { openDialog = true}) {
+        FloatingActionButton(
+            onClick = { openDialog = true },
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+        ) {
             Icon(
-                imageVector = Icons.Default.Add, contentDescription = "Add"
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(id = R.string.add)
             )
         }
         if (openDialog)
-        AlertDialog(
-            shape = RoundedCornerShape(25.dp),
-            onDismissRequest = { openDialog = false },
-            title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
-            text = {
-                OutlinedTextField(
-                    value = procedureType,
-                    onValueChange = { procedureType = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    ),
-                    label = { Text(text = stringResource(id = R.string.procedure_type)) }
-                )
-            },
-            confirmButton = {
-                Button(
-                    shape = RoundedCornerShape(25.dp),
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.addType(procedureType)
-                        }
-                        openDialog = false
-                    },
-                ) {
-                    Text(
-                        stringResource(R.string.save),
-                        style = MaterialTheme.typography.labelSmall
+            AlertDialog(
+                shape = RoundedCornerShape(25.dp),
+                onDismissRequest = { openDialog = false },
+                title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
+                text = {
+                    OutlinedTextField(
+                        value = procedureType,
+                        onValueChange = { procedureType = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        ),
+                        label = { Text(text = stringResource(id = R.string.procedure_type)) }
                     )
+                },
+                confirmButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.addType(procedureType)
+                            }
+                            openDialog = false
+                        },
+                    ) {
+                        Text(
+                            stringResource(R.string.save),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
+                        onClick = {
+                            openDialog = false
+                        }) {
+                        Text(
+                            stringResource(R.string.cancel),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
                 }
-            },
-            dismissButton = {
-                Button(
-                    shape = RoundedCornerShape(25.dp),
-                    onClick = {
-                        openDialog = false
-                    }) {
-                    Text(
-                        stringResource(R.string.cancel),
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                }
-            }
-        )
+            )
     }, bottomBar = {
         BottomBar(navController = navController)
     }) { innerPadding ->
@@ -158,7 +162,7 @@ fun TypeDetails(typeList: List<Type>, modifier: Modifier, viewModel: ManageTypeV
             modifier = Modifier
                 .padding(16.dp),
             text = stringResource(id = R.string.manage_types),
-            style = MaterialTheme.typography.displayMedium
+            style = MaterialTheme.typography.headlineMedium
         )
         for (type in typeList) {
             TypeCard(
@@ -188,21 +192,25 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                 .fillMaxWidth()
                 .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (!editable) {
                 Text(
                     text = type.type,
-                    style = MaterialTheme.typography.displayMedium,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = modifier.weight(1f)
                 )
-                Spacer(modifier = modifier.weight(1f))
                 IconButton(onClick = { editable = true }) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription = stringResource(R.string.edit)
                     )
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        viewModel.deleteType(type.id)
+                    }
+                }) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
                         contentDescription = stringResource(R.string.delete)

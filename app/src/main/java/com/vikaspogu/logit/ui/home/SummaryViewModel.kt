@@ -6,14 +6,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.vikaspogu.logit.LogItApplication
+import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.Summary
 import com.vikaspogu.logit.data.repository.EntryRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class SummaryViewModel(entryRepository: EntryRepository) : ViewModel() {
+class SummaryViewModel(private val entryRepository: EntryRepository) : ViewModel() {
+
+    private val _entryTypeUiState = MutableStateFlow(EntryTypeUiState(emptyList()))
+    val entryTypeUiState: StateFlow<EntryTypeUiState> = _entryTypeUiState
 
     val summaryUiState: StateFlow<SummaryUiState> = entryRepository.getSummary().map {
         SummaryUiState(it)
@@ -22,6 +27,12 @@ class SummaryViewModel(entryRepository: EntryRepository) : ViewModel() {
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
         initialValue = SummaryUiState()
     )
+
+    suspend fun getEntriesByType(typeId: Int) {
+            entryRepository.getEntriesByType(typeId).collect{
+                entries -> _entryTypeUiState.value = EntryTypeUiState(entries)
+            }
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -37,3 +48,4 @@ class SummaryViewModel(entryRepository: EntryRepository) : ViewModel() {
 }
 
 data class SummaryUiState(val summaryList: List<Summary> = listOf())
+data class EntryTypeUiState(val entryTypeList: List<Entry> = listOf())

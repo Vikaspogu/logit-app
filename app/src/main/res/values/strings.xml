@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">LogIt</string>
     <string name="summary">Summary</string>
+    <string name="history">History</string>
     <string name="about">About</string>
     <string name="expand_button_content_description">See more or less information.</string>
     <string name="delete_confirmation_title">Delete entry?</string>

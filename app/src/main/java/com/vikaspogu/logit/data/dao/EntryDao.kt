@@ -13,14 +13,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EntryDao {
 
-    @Query("SELECT sum(entries.quantity) as total,types.type FROM entries Inner join types on entries.type_id=types.id GROUP by type_id")
+    @Query("SELECT sum(entries.quantity) as total,types.type, types.id as type_id FROM entries Inner join types on entries.type_id=types.id GROUP by type_id")
     fun getSummary(): Flow<List<Summary>>
 
     @Query("SELECT * FROM entries")
     fun getAllEntries(): Flow<List<Entry>>
 
-    @Query("SELECT entries.id as entry_id,entries.quantity,entries.age,entries.notes,entries.attending_name,entries.entry_date,entries.type_id,types.type FROM entries INNER JOIN types ON entries.type_id=types.id")
+    @Query("SELECT entries.id as entry_id,entries.quantity,entries.age,entries.notes,entries.attending_name,entries.entry_date,entries.type_id,types.type FROM entries INNER JOIN types ON entries.type_id=types.id ORDER BY entry_date DESC")
     fun getAllEntriesWithTypes(): Flow<List<EntryType>>
+
+    @Query("SELECT * FROM entries WHERE type_id = :typeId")
+    fun getEntriesByType(typeId: Int): Flow<List<Entry>>
 
     @Query("SELECT * from entries WHERE id = :id")
     fun getEntry(id: Int): Flow<Entry>

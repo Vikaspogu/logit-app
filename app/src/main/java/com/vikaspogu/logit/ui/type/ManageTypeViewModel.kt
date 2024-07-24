@@ -34,6 +34,10 @@ class ManageTypeViewModel(private val typeRepository: TypeRepository) : ViewMode
         }
     }
 
+    suspend fun deleteType(id: Int){
+        typeRepository.deleteType(id)
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
         val factory: ViewModelProvider.Factory = viewModelFactory {
