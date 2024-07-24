@@ -66,7 +66,7 @@ fun AddEditEntry(
     modifier: Modifier
 ) {
     Scaffold(topBar = {
-        TopBar(true, navController, NavigationDestinations.Entries)
+        TopBar(true, navController, NavigationDestinations.Summary)
     }) { innerPadding ->
         AddEditForm(
             modifier = modifier
@@ -209,7 +209,7 @@ fun AddEditForm(
                 coroutineScope.launch {
                     viewModel.updateEntry()
                 }
-                navController.navigate(NavigationDestinations.Summary.name)
+                navController.navigate(NavigationDestinations.Entries.name)
             }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
                 Text(text = stringResource(id = R.string.update))
             }

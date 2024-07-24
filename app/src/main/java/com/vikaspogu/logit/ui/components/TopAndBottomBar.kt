@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,7 +39,7 @@ fun TopBar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.displayLarge
+                    style = MaterialTheme.typography.displayMedium
                 )
                 Image(
                     modifier = Modifier
@@ -81,7 +80,7 @@ fun BottomBar(navController: NavHostController) {
                 icon = {
                     Icon(
                         navigationItem.icon,
-                        contentDescription = navigationItem.label
+                        contentDescription = navigationItem.label,
                     )
                 },
                 onClick = {

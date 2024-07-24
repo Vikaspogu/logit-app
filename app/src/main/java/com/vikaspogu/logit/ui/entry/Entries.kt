@@ -17,7 +17,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,13 +53,18 @@ fun EntriesScreen(
     }, bottomBar = {
         BottomBar(navController = navController)
     }) { innerPadding ->
-        Entries(
-            entries = entriesUiState.entries,
-            contentPadding = innerPadding,
-            modifier = modifier.fillMaxSize(),
-            navController,
-            viewModel
-        )
+        if(entriesUiState.entries.isNotEmpty()){
+            Entries(
+                entries = entriesUiState.entries,
+                contentPadding = innerPadding,
+                modifier = modifier.fillMaxSize(),
+                navController,
+                viewModel
+            )
+        } else {
+            EmptyEntries(modifier = modifier)
+        }
+        
     }
 }
 
@@ -86,7 +90,17 @@ private fun Entries(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EmptyEntries(modifier: Modifier) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "You don't have any entries", style = MaterialTheme.typography.headlineSmall)
+    }
+}
+
 @Composable
 private fun EntriesCard(
     entry: EntryType,
@@ -123,55 +137,55 @@ private fun EntriesCard(
                 ) {
                     Column {
                         Text(
-                            text = entry.type, style = MaterialTheme.typography.displayMedium
+                            text = entry.type, style = MaterialTheme.typography.headlineSmall
                         )
                         Row {
                             Text(
                                 text = stringResource(id = R.string.date).plus(": "),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
                                 text = entry.entryDate.formatDate(),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                         Row {
                             Text(
                                 text = stringResource(id = R.string.attending).plus(": "),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
                                 text = entry.attendingName,
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                         Row {
                             Text(
                                 text = stringResource(id = R.string.age).plus(": "),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
                                 text = entry.age.toString(),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                         Row {
                             Text(
                                 text = stringResource(id = R.string.quantity).plus(": "),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
                                 text = entry.quantity.toString(),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                         Row {
                             Text(
                                 text = stringResource(id = R.string.notes).plus(": "),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                text = entry.notes, style = MaterialTheme.typography.labelMedium
+                                text = entry.notes, style = MaterialTheme.typography.bodyMedium
                             )
                         }
 

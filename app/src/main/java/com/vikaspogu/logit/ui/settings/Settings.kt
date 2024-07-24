@@ -72,7 +72,7 @@ fun SettingColumn(
                 modifier = Modifier
                     .padding(16.dp),
                 text = stringResource(id = R.string.settings),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.titleLarge
             )
             SettingsBasicLinkItem(
                 title = R.string.manage_types,
@@ -87,7 +87,7 @@ fun SettingColumn(
                 modifier = Modifier
                     .padding(16.dp),
                 text = stringResource(id = R.string.about),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.titleLarge
             )
             SettingsBasicLinkItem(
                 title = R.string.project_on_github,
@@ -134,12 +134,12 @@ fun SettingsBasicLinkItem(
             Spacer(Modifier.width(12.dp))
             Text(
                 text = stringResource(id = title),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
         Text(
             text = subtitle,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
