@@ -101,22 +101,22 @@ data class AddEntryUiState(
 )
 
 data class AddEntry(
-    var quantity: Int = 0,
+    var quantity: String = "",
     var notes: String = "",
     var entryDate: Long = System.currentTimeMillis(),
     var attendingName: String = "",
-    var age: Int = 0,
+    var age: String = "",
     var id: Int = 0,
     var typeId: Int = 0
 )
 
 fun AddEntry.toEntry(): Entry = Entry(
     notes = notes,
-    quantity = quantity,
+    quantity = quantity.toIntOrNull() ?: 0,
     id = id,
     entryDate = entryDate,
     attendingName = attendingName,
-    age = age,
+    age = age.toIntOrNull() ?: 0,
     typeId = typeId
 )
 
@@ -126,10 +126,10 @@ fun Entry.toAddEntryUiState(): AddEntryUiState = AddEntryUiState(
 
 fun Entry.toAddEntry(): AddEntry = AddEntry(
     notes = notes,
-    quantity = quantity,
+    quantity = quantity.toString(),
     entryDate = entryDate,
     attendingName = attendingName,
-    age = age,
+    age = age.toString(),
     id = id,
     typeId = typeId
 )

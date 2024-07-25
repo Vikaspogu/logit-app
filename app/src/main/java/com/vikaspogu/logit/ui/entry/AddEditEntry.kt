@@ -114,8 +114,8 @@ fun AddEditForm(
             label = { Text(text = stringResource(R.string.attending)) }
         )
         OutlinedTextField(
-            value = addEntry.age.toString(),
-            onValueChange = { onValueChange(addEntry.copy(age = it.toInt())) },
+            value = addEntry.age,
+            onValueChange = { onValueChange(addEntry.copy(age = it)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = true,
             singleLine = true,
@@ -128,8 +128,8 @@ fun AddEditForm(
             label = { Text(text = stringResource(R.string.age)) }
         )
         OutlinedTextField(
-            value = addEntry.quantity.toString(),
-            onValueChange = { onValueChange(addEntry.copy(quantity = it.toInt())) },
+            value = addEntry.quantity,
+            onValueChange = { onValueChange(addEntry.copy(quantity = it)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = true,
             singleLine = true,
