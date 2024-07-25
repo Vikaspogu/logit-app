@@ -18,6 +18,7 @@ import com.vikaspogu.logit.ui.entry.EntriesViewModel
 import com.vikaspogu.logit.ui.home.SummaryScreen
 import com.vikaspogu.logit.ui.home.SummaryViewModel
 import com.vikaspogu.logit.ui.settings.Settings
+import com.vikaspogu.logit.ui.settings.SettingsViewModel
 import com.vikaspogu.logit.ui.type.ManageType
 import com.vikaspogu.logit.ui.type.ManageTypeViewModel
 
@@ -85,7 +86,8 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
             composable(route = NavigationDestinations.Settings.name) {
                 Settings(
                     navController = navController,
-                    modifier
+                    modifier,
+                    viewModel(factory = SettingsViewModel.factory),
                 )
             }
             composable(route = NavigationDestinations.Types.name) {

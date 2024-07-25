@@ -1,7 +1,14 @@
 package com.vikaspogu.logit.ui.settings
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -23,6 +30,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,16 +39,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavHostController
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.vikaspogu.logit.BuildConfig
 import com.vikaspogu.logit.R
+import com.vikaspogu.logit.data.model.Entry
+import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.entry.formatDate
 import com.vikaspogu.logit.ui.util.Constants
+import kotlinx.coroutines.flow.forEach
+import java.util.Locale
+
 
 @Composable
-fun Settings(navController: NavHostController, modifier: Modifier) {
+fun Settings(navController: NavHostController, modifier: Modifier, viewModel: SettingsViewModel) {
     Scaffold(
         topBar = {
             TopBar(
@@ -54,7 +71,8 @@ fun Settings(navController: NavHostController, modifier: Modifier) {
         SettingColumn(
             contentPadding = innerPadding,
             modifier = modifier.fillMaxSize(),
-            navController
+            navController,
+            viewModel
         )
     }
 }
@@ -64,7 +82,17 @@ fun SettingColumn(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    viewModel: SettingsViewModel
 ) {
+    val context = LocalContext.current
+    val entriesList by viewModel.entriesUiState.collectAsState()
+    val chooseDirectoryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            exportCSV(it, context, entriesList.entries)
+        }
+    }
     LazyColumn(
         modifier = modifier, contentPadding = contentPadding
     ) {
@@ -77,9 +105,16 @@ fun SettingColumn(
             )
             SettingsBasicLinkItem(
                 title = R.string.manage_types,
-                icon = R.drawable.edit_vector_icon,
+                icon = R.drawable.ic_code,
                 onClick = {
                     navController.navigate(NavigationDestinations.Types.name)
+                }
+            )
+            SettingsBasicLinkItem(
+                title = R.string.export_csv,
+                icon = R.drawable.ic_export,
+                onClick = {
+                    chooseDirectoryLauncher.launch(null)
                 }
             )
         }
@@ -191,4 +226,26 @@ fun SettingsSwitchCard(
             onCheck(it)
         })
     }
+}
+
+private fun exportCSV(directoryUri: Uri, context: Context, entriesList: List<EntryType>){
+    try {
+        val fileName = "Log_Backup_${System.currentTimeMillis()}.csv"
+        val pickedDir = DocumentFile.fromTreeUri(context, directoryUri)
+        val destination = pickedDir!!.createFile("csv", fileName)
+        csvWriter().open(destination?.let { context.contentResolver.openOutputStream(it.uri) }!!){
+            writeRow(listOf("[type]", "[attending name]", "[date]","[age]","[quantity]"))
+            entriesList.forEach {entry ->
+                writeRow(listOf(entry.type,entry.attendingName,entry.entryDate.getFormattedDate(),entry.age,entry.quantity))
+            }
+        }
+        Toast.makeText(context, "Exported SuccessFully.", Toast.LENGTH_LONG).show()
+    } catch (sqlEx: Exception) {
+        Toast.makeText(context, "Cannot export CSV.", Toast.LENGTH_LONG).show()
+    }
+}
+
+private fun Long.getFormattedDate(): String {
+    val sdf = SimpleDateFormat("EEE, MMM dd, yyyy", Locale.getDefault())
+    return sdf.format(this)
 }
