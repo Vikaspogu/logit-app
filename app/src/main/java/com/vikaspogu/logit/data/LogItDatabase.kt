@@ -30,7 +30,6 @@ abstract class LogItDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, LogItDatabase::class.java, "logit_database")
                     .createFromAsset("database/logit_database.db")
-                    .fallbackToDestructiveMigration()
                     .build()
                     .also { Instance = it }
             }
