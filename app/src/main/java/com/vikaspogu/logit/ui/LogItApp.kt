@@ -15,6 +15,8 @@ import com.vikaspogu.logit.ui.entry.AddEditEntry
 import com.vikaspogu.logit.ui.entry.AddEntryViewModel
 import com.vikaspogu.logit.ui.entry.EntriesScreen
 import com.vikaspogu.logit.ui.entry.EntriesViewModel
+import com.vikaspogu.logit.ui.home.SummaryDetailsScreen
+import com.vikaspogu.logit.ui.home.SummaryDetailsViewModel
 import com.vikaspogu.logit.ui.home.SummaryScreen
 import com.vikaspogu.logit.ui.home.SummaryViewModel
 import com.vikaspogu.logit.ui.settings.Settings
@@ -23,10 +25,7 @@ import com.vikaspogu.logit.ui.type.ManageType
 import com.vikaspogu.logit.ui.type.ManageTypeViewModel
 
 enum class NavigationDestinations {
-    Summary,
-    Entries,
-    Settings,
-    Types
+    Summary, Entries, Settings, Types
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -37,30 +36,6 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
         NavHost(
             navController = navController,
             startDestination = NavigationDestinations.Summary.name,
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(700)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(700)
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(700)
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(700)
-                )
-            }
         ) {
             composable(route = NavigationDestinations.Summary.name) {
                 SummaryScreen(
@@ -90,11 +65,54 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
                     viewModel(factory = SettingsViewModel.factory),
                 )
             }
-            composable(route = NavigationDestinations.Types.name) {
+            composable(route = NavigationDestinations.Types.name, enterTransition = {
+                when (initialState.destination.route) {
+                    NavigationDestinations.Settings.name -> slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(700)
+                    )
+
+                    else -> null
+                }
+            }, exitTransition = {
+                when (targetState.destination.route) {
+                    NavigationDestinations.Settings.name -> slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(700)
+                    )
+
+                    else -> null
+                }
+            }) {
                 ManageType(
                     navController = navController,
                     viewModel(factory = ManageTypeViewModel.factory),
                     modifier
+                )
+            }
+            composable(route = "summaryDetails/{typeId}", enterTransition = {
+                when (initialState.destination.route) {
+                    NavigationDestinations.Summary.name -> slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(700)
+                    )
+
+                    else -> null
+                }
+            }, exitTransition = {
+                when (targetState.destination.route) {
+                    NavigationDestinations.Summary.name -> slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(700)
+                    )
+
+                    else -> null
+                }
+            }) {
+                SummaryDetailsScreen(
+                    navController = navController,
+                    modifier = modifier,
+                    viewModel = viewModel(factory = SummaryDetailsViewModel.factory)
                 )
             }
         }

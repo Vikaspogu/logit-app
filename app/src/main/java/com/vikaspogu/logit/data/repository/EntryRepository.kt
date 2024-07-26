@@ -9,7 +9,7 @@ interface EntryRepository {
     fun getSummary(): Flow<List<Summary>>
     fun getEntries(): Flow<List<Entry>>
     fun getEntriesWithTypes(): Flow<List<EntryType>>
-    fun getEntriesByType(typeId: Int): Flow<List<Entry>>
+    fun getEntriesByType(typeId: Int): Flow<List<EntryType>>
     fun getEntry(id: Int): Flow<Entry>
     suspend fun insertEntry(entry: Entry)
     suspend fun updateEntry(entry: Entry)

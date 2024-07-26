@@ -1,28 +1,31 @@
 package com.vikaspogu.logit.ui.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.vikaspogu.logit.LogItApplication
 import com.vikaspogu.logit.data.model.Entry
-import com.vikaspogu.logit.data.model.Summary
+import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.data.repository.EntryRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class SummaryViewModel(private val entryRepository: EntryRepository) : ViewModel() {
+class SummaryDetailsViewModel(savedStateHandle: SavedStateHandle, private val entryRepository: EntryRepository) : ViewModel() {
 
-    val summaryUiState: StateFlow<SummaryUiState> = entryRepository.getSummary().map {
-        SummaryUiState(it)
+    private val typeId: String = checkNotNull(savedStateHandle["typeId"])
+
+    val entryTypeUiState: StateFlow<EntryTypeUiState> = entryRepository.getEntriesByType(typeId.toInt()).map {
+        EntryTypeUiState(it)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = SummaryUiState()
+        initialValue = EntryTypeUiState()
     )
 
     companion object {
@@ -31,11 +34,10 @@ class SummaryViewModel(private val entryRepository: EntryRepository) : ViewModel
             initializer {
                 val application =
                     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as LogItApplication)
-                SummaryViewModel(application.entryRepository)
+                SummaryDetailsViewModel(this.createSavedStateHandle(),application.entryRepository)
             }
         }
     }
-
 }
 
-data class SummaryUiState(val summaryList: List<Summary> = listOf())
+data class EntryTypeUiState(val entryTypeList: List<EntryType> = listOf())

@@ -1,6 +1,7 @@
 package com.vikaspogu.logit.ui.type
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,10 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
@@ -42,6 +46,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -69,9 +75,17 @@ fun ManageType(
     val coroutineScope = rememberCoroutineScope()
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
-            title = {
-                TopBar(true, navController, NavigationDestinations.Settings)
-            },
+            title = {},
+            navigationIcon = {
+                IconButton(onClick = {
+                    navController.navigate(NavigationDestinations.Settings.name)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = stringResource(id = R.string.back)
+                    )
+                }
+            }
         )
     }, floatingActionButton = {
         FloatingActionButton(
@@ -131,8 +145,6 @@ fun ManageType(
                     }
                 }
             )
-    }, bottomBar = {
-        BottomBar(navController = navController)
     }) { innerPadding ->
         TypeList(
             typeList = typeUiState.typeList, contentPadding = innerPadding,
@@ -186,14 +198,14 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Card(
-        modifier = modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
+        modifier = modifier.padding(start = 5.dp, end = 0.dp, top = 5.dp, bottom = 5.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         shape = MaterialTheme.shapes.large,
     ) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(5.dp),
+                .padding(start = 10.dp, end = 0.dp, top = 10.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -214,7 +226,11 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                         try {
                             viewModel.deleteType(type.id)
                         } catch (e: Exception) {
-                            Toast.makeText(context, "Procedure Type cannot be deleted.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                context,
+                                "Procedure Type cannot be deleted.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }) {

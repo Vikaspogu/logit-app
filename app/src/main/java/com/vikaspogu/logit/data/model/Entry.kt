@@ -12,6 +12,11 @@ import androidx.room.PrimaryKey
             entity = Type::class,
             parentColumns = ["id"],
             childColumns = ["type_id"]
+        ),
+        ForeignKey(
+            entity = Attending::class,
+            parentColumns = ["id"],
+            childColumns = ["attending_id"]
         )
     ]
 )
@@ -21,8 +26,9 @@ data class Entry(
     val quantity: Int,
     val notes: String,
     val age: Int,
-    @ColumnInfo(name = "attending_name")
-    val attendingName: String,
+    val gender: String,
+    @ColumnInfo(name = "attending_id", index = true)
+    val attendingId: Int,
     @ColumnInfo(name = "entry_date")
     val entryDate: Long = 0L,
     @ColumnInfo(name = "type_id", index = true)

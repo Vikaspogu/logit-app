@@ -14,5 +14,6 @@ data class EntryType(
     val entryDate: Long = 0L,
     @ColumnInfo(name = "type_id")
     val typeId: Int,
-    val type: String
+    val type: String,
+    val gender: String
 )

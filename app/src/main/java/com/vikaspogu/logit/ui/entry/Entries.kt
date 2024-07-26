@@ -3,21 +3,32 @@ package com.vikaspogu.logit.ui.entry
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -37,6 +48,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,6 +99,7 @@ private fun Entries(
         modifier = modifier, contentPadding = contentPadding
     ) {
         items(entries) { item ->
+//            ItemEntryCard(entry = item,modifier)
             EntriesCard(
                 entry = item,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
@@ -142,52 +155,66 @@ private fun EntriesCard(
             ) {
                 Text(
                     text = entry.type,
-                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineSmall
                 )
-                Text(
-                    text = stringResource(id = R.string.date),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = entry.entryDate.formatDate(), style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = stringResource(id = R.string.attending),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = entry.attendingName, style = MaterialTheme.typography.bodyMedium
-                )
-                if (expanded) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Icon(imageVector = Icons.Filled.Face, contentDescription = stringResource(id = R.string.attending))
                     Text(
-                        text = stringResource(id = R.string.age),
+                        text = entry.attendingName,
+                        modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 0.dp),
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
+                }
+                Row(verticalAlignment = Alignment.Bottom)  {
+                    Icon(imageVector = Icons.Outlined.DateRange, contentDescription = stringResource(
+                        id = R.string.date
+                    ))
                     Text(
-                        text = entry.age.toString(), style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Text(
-                        text = stringResource(id = R.string.quantity),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = entry.quantity.toString(),
+                        text = buildString {
+                            append(entry.entryDate.formatDate())
+                        },
+                        modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 5.dp),
                         style = MaterialTheme.typography.bodyMedium
                     )
+                }
+                Text(
+                    text = buildString {
+                        append(entry.age)
+                        append(" yrs | ")
+                        append(entry.gender)
+                        append(" | ")
+                        append(entry.quantity)
+                        append(" quantity")
+                    },
+                    modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Box(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.inversePrimary)
+                        .clickable(onClick = { expanded = !expanded }),
+                ) {
+                    Text(
+                        text = if (!expanded) stringResource(id = R.string.show_notes) else stringResource(id = R.string.hide_notes), modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
+                if (expanded) {
                     Text(
                         text = stringResource(id = R.string.notes),
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 5.dp),
                     )
                     Text(
-                        text = entry.notes, style = MaterialTheme.typography.bodyMedium
+                        text = entry.notes, style = MaterialTheme.typography.bodyMedium,modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
                     )
                 }
 
@@ -201,13 +228,7 @@ private fun EntriesCard(
                     )
                 }
                 Spacer(modifier = modifier.weight(1f))
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        imageVector = if (expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
-                        contentDescription = stringResource(id = R.string.expand_button_content_description),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
+
             }
             if (openDialog) AlertDialog(shape = RoundedCornerShape(25.dp),
                 onDismissRequest = { openDialog = false },

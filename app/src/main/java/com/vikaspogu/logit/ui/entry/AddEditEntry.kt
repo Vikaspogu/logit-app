@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -31,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -48,10 +52,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
+import com.vikaspogu.logit.data.model.Attending
 import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.TopBar
@@ -94,24 +100,24 @@ fun AddEditForm(
     viewModel: AddEntryViewModel
 ) {
     val typesUiState by viewModel.typeUiState.collectAsState()
+    val attendingUiState by viewModel.attendingUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    if (addEntry.gender.isEmpty()) {
+        addEntry.gender = "Male"
+    }
+    val radioOptions = listOf("Male", "Female")
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(addEntry.gender) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
         modifier = modifier.padding(10.dp)
     ) {
-        OutlinedTextField(
-            value = addEntry.attendingName,
-            onValueChange = { onValueChange(addEntry.copy(attendingName = it)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            label = { Text(text = stringResource(R.string.attending)) }
+        DropdownAttending(
+            items = attendingUiState.attending,
+            label = stringResource(R.string.attending),
+            addEntry,
+            viewModel
         )
         OutlinedTextField(
             value = addEntry.age,
@@ -127,6 +133,37 @@ fun AddEditForm(
             ),
             label = { Text(text = stringResource(R.string.age)) }
         )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            radioOptions.forEach { text ->
+                Row(
+                    Modifier
+                        .height(56.dp)
+                        .selectable(
+                            selected = (text == addEntry.gender),
+                            onClick = {
+                                onOptionSelected(text)
+                                addEntry.gender = text
+                            },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (text == selectedOption),
+                        onClick = null
+                    )
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+        }
         OutlinedTextField(
             value = addEntry.quantity,
             onValueChange = { onValueChange(addEntry.copy(quantity = it)) },
@@ -220,6 +257,145 @@ fun AddEditForm(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun DropdownAttending(
+    items: List<Attending>,
+    label: String,
+    addEntry: AddEntry,
+    viewModel: AddEntryViewModel
+) {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+    var openDialog by rememberSaveable { mutableStateOf(false) }
+    var attendingName by remember {
+        mutableStateOf("")
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val editType = items.find { it.id == addEntry.attendingId }
+    if (editType?.name?.isNotEmpty() == true) {
+        LaunchedEffect(viewModel.selectedAttending) {
+            viewModel.updateSelectedAttending(editType.name)
+        }
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        TextField(
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            value = viewModel.selectedAttending.value,
+            label = { Text(text = label) },
+            onValueChange = { viewModel.updateSelectedAttending(it) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+        )
+
+        val filteredOptions =
+            items.filter { it.name.contains(viewModel.selectedAttending.value, ignoreCase = true) }
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { },
+        ) {
+            if (filteredOptions.isEmpty()) {
+                IconButton(onClick = { openDialog = true }, Modifier.fillMaxWidth()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Add, contentDescription = stringResource(
+                                id = R.string.add
+                            )
+                        )
+                        Text(text = stringResource(R.string.add))
+                    }
+                }
+            }
+
+            filteredOptions.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item.name) },
+                    onClick = {
+                        addEntry.attendingId = item.id
+                        viewModel.updateSelectedAttending(item.name)
+                        expanded = false
+                        Toast.makeText(context, item.name, Toast.LENGTH_SHORT).show()
+                    },
+                )
+
+            }
+            if (filteredOptions.isNotEmpty()) {
+                IconButton(onClick = { openDialog = true }, Modifier.width(175.dp)) {
+                    Row {
+                        Icon(
+                            imageVector = Icons.Outlined.Add, contentDescription = stringResource(
+                                id = R.string.add
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = stringResource(R.string.add_attending_confirmation_title))
+                    }
+                }
+            }
+
+            if (openDialog)
+                AlertDialog(
+                    shape = RoundedCornerShape(25.dp),
+                    onDismissRequest = { openDialog = false },
+                    title = { Text(stringResource(R.string.add_attending_confirmation_title)) },
+                    text = {
+                        OutlinedTextField(
+                            value = attendingName,
+                            onValueChange = { attendingName = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            ),
+                            label = { Text(text = stringResource(id = R.string.attending)) }
+                        )
+                    },
+                    confirmButton = {
+                        Button(
+                            shape = RoundedCornerShape(25.dp),
+                            onClick = {
+                                coroutineScope.launch {
+                                    viewModel.addAttending(attendingName)
+                                }
+                                openDialog = false
+                            },
+                        ) {
+                            Text(
+                                stringResource(R.string.save),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            shape = RoundedCornerShape(25.dp),
+                            onClick = {
+                                openDialog = false
+                            }) {
+                            Text(
+                                stringResource(R.string.cancel),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    }
+                )
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun Dropdown(
     items: List<Type>,
     label: String,
@@ -236,9 +412,9 @@ fun Dropdown(
     val coroutineScope = rememberCoroutineScope()
 
     val editType = items.find { it.id == addEntry.typeId }
-    if(editType?.type?.isNotEmpty() == true){
-        LaunchedEffect(viewModel.selectedText) {
-            viewModel.updateSelectedText(editType.type)
+    if (editType?.type?.isNotEmpty() == true) {
+        LaunchedEffect(viewModel.selectedProcedure) {
+            viewModel.updateSelectedProcedure(editType.type)
         }
     }
 
@@ -250,91 +426,108 @@ fun Dropdown(
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth(),
-            value = viewModel.selectedText.value,
+            value = viewModel.selectedProcedure.value,
             label = { Text(text = label) },
-            onValueChange = { viewModel.updateSelectedText(it) },
+            onValueChange = { viewModel.updateSelectedProcedure(it) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )
 
-        val filteredOptions = items.filter { it.type.contains(viewModel.selectedText.value, ignoreCase = true) }
-        if (filteredOptions.isNotEmpty()) {
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { },
-            ) {
-                filteredOptions.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(item.type) },
-                        onClick = {
-                            addEntry.typeId = item.id
-                            viewModel.updateSelectedText(item.type)
-                            expanded = false
-                            Toast.makeText(context, item.type, Toast.LENGTH_SHORT).show()
-                        },
-                    )
-                }
+        val filteredOptions =
+            items.filter { it.type.contains(viewModel.selectedProcedure.value, ignoreCase = true) }
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { },
+        ) {
+            if (filteredOptions.isEmpty()) {
                 IconButton(onClick = { openDialog = true }, Modifier.fillMaxWidth()) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        Icon(imageVector = Icons.Outlined.Add, contentDescription = stringResource(
-                            id = R.string.add
-                        ))
+                        Icon(
+                            imageVector = Icons.Outlined.Add, contentDescription = stringResource(
+                                id = R.string.add
+                            )
+                        )
                         Text(text = stringResource(R.string.add_new_type_confirmation_title))
                     }
                 }
-                if (openDialog)
-                    AlertDialog(
-                        shape = RoundedCornerShape(25.dp),
-                        onDismissRequest = { openDialog = false },
-                        title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
-                        text = {
-                            OutlinedTextField(
-                                value = procedureType,
-                                onValueChange = { procedureType = it },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                ),
-                                label = { Text(text = stringResource(id = R.string.procedure_type)) }
-                            )
-                        },
-                        confirmButton = {
-                            Button(
-                                shape = RoundedCornerShape(25.dp),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        viewModel.addType(procedureType)
-                                    }
-                                    openDialog = false
-                                },
-                            ) {
-                                Text(
-                                    stringResource(R.string.save),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-                        },
-                        dismissButton = {
-                            Button(
-                                shape = RoundedCornerShape(25.dp),
-                                onClick = {
-                                    openDialog = false
-                                }) {
-                                Text(
-                                    stringResource(R.string.cancel),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-                        }
-                    )
             }
+            filteredOptions.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item.type) },
+                    onClick = {
+                        addEntry.typeId = item.id
+                        viewModel.updateSelectedProcedure(item.type)
+                        expanded = false
+                        Toast.makeText(context, item.type, Toast.LENGTH_SHORT).show()
+                    },
+                )
+            }
+            if (filteredOptions.isNotEmpty()) {
+                IconButton(onClick = { openDialog = true }, Modifier.width(175.dp)) {
+                    Row {
+                        Icon(
+                            imageVector = Icons.Outlined.Add,
+                            contentDescription = stringResource(
+                                id = R.string.add
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = stringResource(R.string.add_new_type_confirmation_title))
+                    }
+                }
+            }
+            if (openDialog)
+                AlertDialog(
+                    shape = RoundedCornerShape(25.dp),
+                    onDismissRequest = { openDialog = false },
+                    title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
+                    text = {
+                        OutlinedTextField(
+                            value = procedureType,
+                            onValueChange = { procedureType = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            ),
+                            label = { Text(text = stringResource(id = R.string.procedure_type)) }
+                        )
+                    },
+                    confirmButton = {
+                        Button(
+                            shape = RoundedCornerShape(25.dp),
+                            onClick = {
+                                coroutineScope.launch {
+                                    viewModel.addType(procedureType)
+                                }
+                                openDialog = false
+                            },
+                        ) {
+                            Text(
+                                stringResource(R.string.save),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            shape = RoundedCornerShape(25.dp),
+                            onClick = {
+                                openDialog = false
+                            }) {
+                            Text(
+                                stringResource(R.string.cancel),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    }
+                )
         }
-
     }
 }
 
