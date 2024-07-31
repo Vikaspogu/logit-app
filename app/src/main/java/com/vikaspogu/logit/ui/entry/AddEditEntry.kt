@@ -1,10 +1,8 @@
 package com.vikaspogu.logit.ui.entry
 
-import android.app.TimePickerDialog
 import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
-import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -73,19 +71,24 @@ fun AddEditEntry(
     Scaffold(topBar = {
         TopBar(true, navController, NavigationDestinations.Summary)
     }) { innerPadding ->
-        AddEditForm(
-            modifier = modifier
-                .padding(
-                    start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
-                    top = innerPadding.calculateTopPadding(),
-                    end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
+        LazyColumn {
+            item {
+                AddEditForm(
+                    modifier = modifier
+                        .padding(
+                            start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
+                            top = innerPadding.calculateTopPadding(),
+                            end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
+                        )
+                        .fillMaxWidth(),
+                    navController = navController,
+                    viewModel::updateUiState,
+                    viewModel.addEntryUiState.addEntry,
+                    viewModel
                 )
-                .fillMaxWidth(),
-            navController = navController,
-            viewModel::updateUiState,
-            viewModel.addEntryUiState.addEntry,
-            viewModel
-        )
+            }
+        }
+
     }
 }
 
@@ -125,12 +128,12 @@ fun AddEditForm(
             enabled = true,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            label = { Text(text = stringResource(R.string.age)) }
+            label = {
+                Text(
+                    text = stringResource(R.string.age),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -170,40 +173,40 @@ fun AddEditForm(
             enabled = true,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            label = { Text(text = stringResource(R.string.quantity)) }
+            label = {
+                Text(
+                    text = stringResource(R.string.quantity),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         )
         OutlinedTextField(
             value = addEntry.notes,
             onValueChange = { onValueChange(addEntry.copy(notes = it)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            label = { Text(text = stringResource(R.string.notes)) }
+            label = {
+                Text(
+                    text = stringResource(R.string.notes),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             OutlinedTextField(
-                value = addEntry.entryDate.fullDate(),
+                value = addEntry.entryDate.formatDate(),
                 onValueChange = { },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
-                label = { Text(text = stringResource(R.string.date)) },
+                label = {
+                    Text(
+                        text = stringResource(R.string.date),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 trailingIcon = {
                     IconButton(onClick = {
                         showDatePicker(
@@ -232,21 +235,29 @@ fun AddEditForm(
         )
         Spacer(Modifier.height(20.dp))
         if (viewModel.action == Constants.ADD) {
-            Button(onClick = {
-                coroutineScope.launch {
-                    viewModel.saveEntry()
-                }
-                navController.navigate(NavigationDestinations.Summary.name)
-            }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.saveEntry()
+                    }
+                    navController.navigate(NavigationDestinations.Summary.name)
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            ) {
                 Text(text = stringResource(id = R.string.save))
             }
         } else if (viewModel.action == Constants.EDIT) {
-            Button(onClick = {
-                coroutineScope.launch {
-                    viewModel.updateEntry()
-                }
-                navController.navigate(NavigationDestinations.Entries.name)
-            }, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.updateEntry()
+                    }
+                    navController.navigate(NavigationDestinations.Entries.name)
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            ) {
                 Text(text = stringResource(id = R.string.update))
             }
         }
@@ -287,7 +298,7 @@ fun DropdownAttending(
                 .menuAnchor()
                 .fillMaxWidth(),
             value = viewModel.selectedAttending.value,
-            label = { Text(text = label) },
+            label = { Text(text = label, style = MaterialTheme.typography.bodyMedium) },
             onValueChange = { viewModel.updateSelectedAttending(it) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )
@@ -309,14 +320,17 @@ fun DropdownAttending(
                                 id = R.string.add
                             )
                         )
-                        Text(text = stringResource(R.string.add))
+                        Text(
+                            text = stringResource(R.string.add),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
 
             filteredOptions.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(item.name) },
+                    text = { Text(item.name, style = MaterialTheme.typography.bodyMedium) },
                     onClick = {
                         addEntry.attendingId = item.id
                         viewModel.updateSelectedAttending(item.name)
@@ -335,7 +349,10 @@ fun DropdownAttending(
                             )
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text(text = stringResource(R.string.add_attending_confirmation_title))
+                        Text(
+                            text = stringResource(R.string.add_attending_confirmation_title),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
@@ -351,12 +368,12 @@ fun DropdownAttending(
                             onValueChange = { attendingName = it },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            ),
-                            label = { Text(text = stringResource(id = R.string.attending)) }
+                            label = {
+                                Text(
+                                    text = stringResource(id = R.string.attending),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         )
                     },
                     confirmButton = {
@@ -379,7 +396,7 @@ fun DropdownAttending(
                         ) {
                             Text(
                                 stringResource(R.string.save),
-                                style = MaterialTheme.typography.labelSmall
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     },
@@ -391,7 +408,7 @@ fun DropdownAttending(
                             }) {
                             Text(
                                 stringResource(R.string.cancel),
-                                style = MaterialTheme.typography.labelSmall
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -434,7 +451,7 @@ fun Dropdown(
                 .menuAnchor()
                 .fillMaxWidth(),
             value = viewModel.selectedProcedure.value,
-            label = { Text(text = label) },
+            label = { Text(text = label, style = MaterialTheme.typography.bodyMedium) },
             onValueChange = { viewModel.updateSelectedProcedure(it) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )
@@ -457,13 +474,16 @@ fun Dropdown(
                                 id = R.string.add
                             )
                         )
-                        Text(text = stringResource(R.string.add_new_type_confirmation_title))
+                        Text(
+                            text = stringResource(R.string.add_new_type_confirmation_title),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
             filteredOptions.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(item.type) },
+                    text = { Text(item.type, style = MaterialTheme.typography.bodyMedium) },
                     onClick = {
                         addEntry.typeId = item.id
                         viewModel.updateSelectedProcedure(item.type)
@@ -482,7 +502,10 @@ fun Dropdown(
                             )
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text(text = stringResource(R.string.add_new_type_confirmation_title))
+                        Text(
+                            text = stringResource(R.string.add_new_type_confirmation_title),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
@@ -497,12 +520,12 @@ fun Dropdown(
                             onValueChange = { procedureType = it },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            ),
-                            label = { Text(text = stringResource(id = R.string.procedure_type)) }
+                            label = {
+                                Text(
+                                    text = stringResource(id = R.string.procedure_type),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         )
                     },
                     confirmButton = {
@@ -517,7 +540,7 @@ fun Dropdown(
                         ) {
                             Text(
                                 stringResource(R.string.save),
-                                style = MaterialTheme.typography.labelSmall
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     },
@@ -529,7 +552,7 @@ fun Dropdown(
                             }) {
                             Text(
                                 stringResource(R.string.cancel),
-                                style = MaterialTheme.typography.labelSmall
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -538,7 +561,6 @@ fun Dropdown(
     }
 }
 
-
 private fun showDatePicker(
     date: Calendar,
     context: Context,
@@ -546,21 +568,12 @@ private fun showDatePicker(
 ) {
 
     val tempDate = Calendar.getInstance()
-    val timePicker = TimePickerDialog(
-        context,
-        { _, hour, minute ->
-            tempDate[Calendar.HOUR_OF_DAY] = hour
-            tempDate[Calendar.MINUTE] = minute
-            onDateSelected(tempDate.timeInMillis)
-        }, date[Calendar.HOUR_OF_DAY], date[Calendar.MINUTE], false
-    )
     val datePicker = android.app.DatePickerDialog(
         context,
         { _, year, month, day ->
             tempDate[Calendar.YEAR] = year
             tempDate[Calendar.MONTH] = month
             tempDate[Calendar.DAY_OF_MONTH] = day
-            timePicker.show()
         },
         date[Calendar.YEAR],
         date[Calendar.MONTH],
@@ -570,17 +583,7 @@ private fun showDatePicker(
 }
 
 @Composable
-fun Long.fullDate(): String {
-    val hourPatternString = if (is24Hour()) "H:mm" else "h:mm a"
-    val sdf = SimpleDateFormat("MMM dd,yyyy $hourPatternString", Locale.getDefault())
-    return sdf.format(this)
-}
-
-@Composable
 fun Long.formatDate(): String {
     val sdf = SimpleDateFormat("EEE, MMM dd, yyyy", Locale.getDefault())
     return sdf.format(this)
 }
-
-@Composable
-fun is24Hour() = DateFormat.is24HourFormat(LocalContext.current)

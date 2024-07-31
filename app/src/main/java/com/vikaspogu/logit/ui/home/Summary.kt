@@ -1,6 +1,7 @@
 package com.vikaspogu.logit.ui.home
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,21 +14,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -59,7 +59,7 @@ fun SummaryScreen(
                     newValue = Constants.ADD
                 )
             )
-        }, containerColor = MaterialTheme.colorScheme.tertiaryContainer) {
+        }, containerColor = MaterialTheme.colorScheme.primaryContainer) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(id = R.string.add),
@@ -112,13 +112,18 @@ fun EmptySummary(modifier: Modifier) {
 }
 
 @Composable
-fun SummaryDetails(summaryList: List<Summary>, modifier: Modifier, navController: NavHostController) {
+fun SummaryDetails(
+    summaryList: List<Summary>,
+    modifier: Modifier,
+    navController: NavHostController
+) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
         Text(
             modifier = Modifier
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             text = stringResource(id = R.string.summary),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineLarge
         )
         for (summary in summaryList) {
             SummaryCard(
@@ -131,26 +136,35 @@ fun SummaryDetails(summaryList: List<Summary>, modifier: Modifier, navController
 
 @Composable
 fun SummaryCard(summary: Summary, modifier: Modifier, navController: NavHostController) {
-    Card(
-        modifier = modifier.padding(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-        shape = MaterialTheme.shapes.large,
-        onClick = {
-            navController.navigate("summaryDetails/{typeId}".replace(oldValue = "{typeId}", newValue = summary.typeId.toString()))
-        }
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.small)
+            .padding(5.dp, 5.dp, 5.dp, 5.dp)
+            .clickable {
+                navController.navigate(
+                    "summaryDetails/{typeId}".replace(
+                        oldValue = "{typeId}",
+                        newValue = summary.typeId.toString()
+                    )
+                )
+            }
     ) {
         Row(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement  =  Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = summary.type,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = modifier.weight(1f)
             )
             Text(
-                text = summary.total.toString(), style = MaterialTheme.typography.headlineSmall
+                text = summary.total.toString(), style = MaterialTheme.typography.titleLarge
             )
         }
     }

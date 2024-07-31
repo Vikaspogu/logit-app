@@ -1,5 +1,7 @@
 package com.vikaspogu.logit.ui.entry
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,22 +22,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,6 +53,7 @@ import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.theme.slightlyDeemphasizedAlpha
 import com.vikaspogu.logit.ui.util.Constants
 import kotlinx.coroutines.launch
 
@@ -121,6 +116,7 @@ fun EmptyEntries(modifier: Modifier) {
     }
 }
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
 private fun EntriesCard(
     entry: EntryType,
@@ -133,16 +129,29 @@ private fun EntriesCard(
     var expanded by remember {
         mutableStateOf(false)
     }
-    Card(modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+    var showMoreButton by remember {
+        mutableStateOf(false)
+    }
+    var hideOverFlowingText by remember {
+        mutableStateOf(false)
+    }
+
+    Surface(
         shape = MaterialTheme.shapes.large,
-        onClick = {
-            navController.navigate(
-                "addEdit/{action}/{entryId}".replace(
-                    oldValue = "{entryId}", newValue = entry.entryId.toString()
-                ).replace(oldValue = "{action}", newValue = Constants.EDIT)
-            )
-        }) {
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .clickable {
+                navController.navigate(
+                    "addEdit/{action}/{entryId}"
+                        .replace(
+                            oldValue = "{entryId}", newValue = entry.entryId.toString()
+                        )
+                        .replace(oldValue = "{action}", newValue = Constants.EDIT)
+                )
+            }
+) {
         Row(
             modifier = modifier.animateContentSize(
                 animationSpec = spring(
@@ -157,21 +166,29 @@ private fun EntriesCard(
                     text = entry.type,
                     modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Row(verticalAlignment = Alignment.Bottom) {
-                    Icon(imageVector = Icons.Filled.Face, contentDescription = stringResource(id = R.string.attending))
+                    Icon(
+                        imageVector = Icons.Filled.Face,
+                        contentDescription = stringResource(id = R.string.attending)
+                    )
                     Text(
                         text = entry.attendingName,
-                        modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 0.dp),
-                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp, 12.dp, 12.dp, 0.dp),
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = slightlyDeemphasizedAlpha)
                     )
                 }
-                Row(verticalAlignment = Alignment.Bottom)  {
-                    Icon(imageVector = Icons.Outlined.DateRange, contentDescription = stringResource(
-                        id = R.string.date
-                    ))
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Icon(
+                        imageVector = Icons.Outlined.DateRange, contentDescription = stringResource(
+                            id = R.string.date
+                        )
+                    )
                     Text(
                         text = buildString {
                             append(entry.entryDate.formatDate())
@@ -190,34 +207,50 @@ private fun EntriesCard(
                         append(" quantity")
                     },
                     modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                Box(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.inversePrimary)
-                        .clickable(onClick = { expanded = !expanded }),
-                ) {
+                if(!hideOverFlowingText){
                     Text(
-                        text = if (!expanded) stringResource(id = R.string.show_notes) else stringResource(id = R.string.hide_notes), modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                if (expanded) {
-                    Text(
-                        text = stringResource(id = R.string.notes),
+                        text = entry.notes,
+                        maxLines = 2,
+                        onTextLayout = {
+                            if(it.hasVisualOverflow){
+                                showMoreButton=true
+                            }
+                        },
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 5.dp),
-                    )
-                    Text(
-                        text = entry.notes, style = MaterialTheme.typography.bodyMedium,modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                        modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
                     )
                 }
 
+                if(showMoreButton){
+                    AnimatedVisibility(expanded) {
+                        Text(
+                            text = entry.notes,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 10.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.inversePrimary)
+                            .clickable(onClick = {
+                                expanded = !expanded
+                                hideOverFlowingText = !hideOverFlowingText
+                            }),
+                    ) {
+                        Text(
+                            text = if (!expanded) stringResource(id = R.string.show_notes) else stringResource(
+                                id = R.string.hide_notes
+                            ), modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.inverseSurface
+                        )
+                    }
+                }
 
             }
             Column(modifier = modifier) {
@@ -237,7 +270,7 @@ private fun EntriesCard(
                     Text(
                         stringResource(
                             R.string.delete_confirmation_message
-                        ), style = MaterialTheme.typography.labelSmall
+                        ), style = MaterialTheme.typography.bodyMedium
                     )
                 },
                 confirmButton = {
@@ -252,7 +285,7 @@ private fun EntriesCard(
                     ) {
                         Text(
                             stringResource(R.string.delete),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 },
@@ -262,13 +295,12 @@ private fun EntriesCard(
                     }) {
                         Text(
                             stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 })
 
         }
-
 
     }
 }

@@ -13,11 +13,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -67,7 +69,7 @@ fun TopBar(
 
 @Composable
 fun BottomBar(navController: NavHostController) {
-    NavigationBar {
+    NavigationBar(modifier = Modifier.clip(shape = MaterialTheme.shapes.small)) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         BottomNavigationItem().bottomNavigationItems().forEachIndexed { _, navigationItem ->
@@ -75,14 +77,19 @@ fun BottomBar(navController: NavHostController) {
             NavigationBarItem(
                 selected = currentRoute == navigationItem.route,
                 label = {
-                    Text(navigationItem.label)
+                    Text(navigationItem.label, style = MaterialTheme.typography.labelMedium)
                 },
                 icon = {
                     Icon(
-                        navigationItem.icon,
+                        if(currentRoute == navigationItem.route){
+                            navigationItem.selectedIcon
+                        }else{
+                            navigationItem.unselectedIcon
+                        },
                         contentDescription = navigationItem.label,
                     )
                 },
+                colors = NavigationBarItemDefaults.colors(selectedTextColor = MaterialTheme.colorScheme.primary, unselectedTextColor = MaterialTheme.colorScheme.inverseSurface),
                 onClick = {
                     navController.navigate(navigationItem.route) {
                         popUpTo(navController.graph.startDestinationId)

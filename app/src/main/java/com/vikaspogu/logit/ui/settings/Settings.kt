@@ -1,11 +1,9 @@
 package com.vikaspogu.logit.ui.settings
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,11 +20,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,14 +41,11 @@ import androidx.navigation.NavHostController
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.vikaspogu.logit.BuildConfig
 import com.vikaspogu.logit.R
-import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
-import com.vikaspogu.logit.ui.entry.formatDate
 import com.vikaspogu.logit.ui.util.Constants
-import kotlinx.coroutines.flow.forEach
 import java.util.Locale
 
 
@@ -188,11 +182,11 @@ fun SettingsItemCard(
     onClick: () -> Unit = {},
     content: @Composable RowScope.() -> Unit,
 ) {
-    Card(
+    Surface(
         modifier = modifier
-            .padding(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+            .padding(5.dp),
         shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.primaryContainer,
     ) {
         Row(
             Modifier
@@ -220,7 +214,7 @@ fun SettingsSwitchCard(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyMedium
         )
         Switch(checked = checked, onCheckedChange = {
             onCheck(it)

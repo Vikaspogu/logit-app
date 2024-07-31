@@ -9,9 +9,6 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
 import com.vikaspogu.logit.R
 
-val AbrilFatface = FontFamily(
-    Font(R.font.abril_fatface_regular)
-)
 
 val MontserratFontFamily = FontFamily(
     Font(R.font.montserrat_regular),

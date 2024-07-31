@@ -1,6 +1,7 @@
 package com.vikaspogu.logit.ui.home
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -18,14 +20,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,6 +46,7 @@ import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.entry.formatDate
+import com.vikaspogu.logit.ui.theme.slightlyDeemphasizedAlpha
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -90,7 +92,7 @@ fun SummaryDetailsColumn(entryList: List<EntryType>, modifier: Modifier) {
     ) {
         for (entry in entryList) {
             SummaryDetailsCard(
-                entry, modifier
+                entry
             )
         }
         Spacer(Modifier.height(16.dp))
@@ -98,14 +100,20 @@ fun SummaryDetailsColumn(entryList: List<EntryType>, modifier: Modifier) {
 }
 
 @Composable
-fun SummaryDetailsCard(entry: EntryType, modifier: Modifier) {
+fun SummaryDetailsCard(entry: EntryType) {
     var expanded by remember {
         mutableStateOf(false)
     }
-    Card(
-        modifier = modifier.padding(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-        shape = MaterialTheme.shapes.large
+    var showMoreButton by remember {
+        mutableStateOf(false)
+    }
+    var hideOverFlowingText by remember {
+        mutableStateOf(false)
+    }
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.fillMaxWidth().padding(5.dp)
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
@@ -115,7 +123,7 @@ fun SummaryDetailsCard(entry: EntryType, modifier: Modifier) {
                 text = entry.type,
                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.titleLarge
             )
             Row(verticalAlignment = Alignment.Bottom) {
                 Icon(
@@ -125,8 +133,9 @@ fun SummaryDetailsCard(entry: EntryType, modifier: Modifier) {
                 Text(
                     text = entry.attendingName,
                     modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 0.dp),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = slightlyDeemphasizedAlpha)
                 )
             }
             Row(verticalAlignment = Alignment.Bottom) {
@@ -153,37 +162,49 @@ fun SummaryDetailsCard(entry: EntryType, modifier: Modifier) {
                     append(" quantity")
                 },
                 modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.bodyMedium
             )
-            Box(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.inversePrimary)
-                    .clickable(onClick = { expanded = !expanded }),
-            ) {
-                Text(
-                    text = if (!expanded) stringResource(id = R.string.show_notes) else stringResource(
-                        id = R.string.hide_notes
-                    ),
-                    modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            if (expanded) {
-                Text(
-                    text = stringResource(id = R.string.notes),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 5.dp),
-                )
+            if(!hideOverFlowingText){
                 Text(
                     text = entry.notes,
+                    maxLines = 2,
+                    onTextLayout = {
+                        if(it.hasVisualOverflow){
+                            showMoreButton=true
+                        }
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
                 )
+            }
+
+            if(showMoreButton){
+                AnimatedVisibility(expanded) {
+                    Text(
+                        text = entry.notes,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(top = 10.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.inversePrimary)
+                        .clickable(onClick = {
+                            expanded = !expanded
+                            hideOverFlowingText = !hideOverFlowingText
+                        }),
+                ) {
+                    Text(
+                        text = if (!expanded) stringResource(id = R.string.show_notes) else stringResource(
+                            id = R.string.hide_notes
+                        ), modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.inverseSurface
+                    )
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.vikaspogu.logit.ui.type
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Check
@@ -24,8 +22,6 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -33,8 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,16 +42,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
-import com.vikaspogu.logit.ui.components.BottomBar
-import com.vikaspogu.logit.ui.components.TopBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +82,7 @@ fun ManageType(
     }, floatingActionButton = {
         FloatingActionButton(
             onClick = { openDialog = true },
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -101,19 +93,24 @@ fun ManageType(
             AlertDialog(
                 shape = RoundedCornerShape(25.dp),
                 onDismissRequest = { openDialog = false },
-                title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
+                title = {
+                    Text(
+                        stringResource(R.string.add_new_type_confirmation_title),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
                 text = {
                     OutlinedTextField(
                         value = procedureType,
                         onValueChange = { procedureType = it },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        ),
-                        label = { Text(text = stringResource(id = R.string.procedure_type)) }
+                        label = {
+                            Text(
+                                text = stringResource(id = R.string.procedure_type),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     )
                 },
                 confirmButton = {
@@ -128,7 +125,7 @@ fun ManageType(
                     ) {
                         Text(
                             stringResource(R.string.save),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 },
@@ -140,7 +137,7 @@ fun ManageType(
                         }) {
                         Text(
                             stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
@@ -176,7 +173,7 @@ fun TypeDetails(typeList: List<Type>, modifier: Modifier, viewModel: ManageTypeV
             modifier = Modifier
                 .padding(16.dp),
             text = stringResource(id = R.string.manage_types),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineLarge
         )
         for (type in typeList) {
             TypeCard(
@@ -197,22 +194,24 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
     }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    Card(
-        modifier = modifier.padding(start = 5.dp, end = 0.dp, top = 5.dp, bottom = 5.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+    Surface(
         shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
     ) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(start = 10.dp, end = 0.dp, top = 10.dp, bottom = 10.dp),
+                .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (!editable) {
                 Text(
                     text = type.type,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = modifier.weight(1f)
                 )
                 IconButton(onClick = { editable = true }) {
@@ -240,18 +239,18 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                     )
                 }
             }
-            if (editable) {
+            AnimatedVisibility(editable) {
                 OutlinedTextField(
                     value = text,
                     onValueChange = { text = it },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    ),
-                    label = { Text(text = stringResource(id = R.string.manage_types)) },
+                    label = {
+                        Text(
+                            text = stringResource(id = R.string.manage_types),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
                     trailingIcon = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -280,8 +279,7 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                     }
                 )
             }
-
         }
-
     }
 }
+
