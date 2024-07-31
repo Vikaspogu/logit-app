@@ -197,9 +197,10 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.primaryContainer,
+        shadowElevation = 5.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
+            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
     ) {
         Row(
             modifier = modifier

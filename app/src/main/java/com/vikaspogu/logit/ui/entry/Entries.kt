@@ -139,9 +139,10 @@ private fun EntriesCard(
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.primaryContainer,
+        shadowElevation = 5.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
+            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
             .clickable {
                 navController.navigate(
                     "addEdit/{action}/{entryId}"
@@ -151,7 +152,7 @@ private fun EntriesCard(
                         .replace(oldValue = "{action}", newValue = Constants.EDIT)
                 )
             }
-) {
+    ) {
         Row(
             modifier = modifier.animateContentSize(
                 animationSpec = spring(
@@ -209,13 +210,13 @@ private fun EntriesCard(
                     modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                if(!hideOverFlowingText){
+                if (!hideOverFlowingText) {
                     Text(
                         text = entry.notes,
                         maxLines = 2,
                         onTextLayout = {
-                            if(it.hasVisualOverflow){
-                                showMoreButton=true
+                            if (it.hasVisualOverflow) {
+                                showMoreButton = true
                             }
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -223,7 +224,7 @@ private fun EntriesCard(
                     )
                 }
 
-                if(showMoreButton){
+                if (showMoreButton) {
                     AnimatedVisibility(expanded) {
                         Text(
                             text = entry.notes,

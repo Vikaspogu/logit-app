@@ -88,7 +88,8 @@ fun SettingColumn(
         }
     }
     LazyColumn(
-        modifier = modifier, contentPadding = contentPadding
+        modifier = modifier,
+        contentPadding = contentPadding,
     ) {
         item {
             Text(
@@ -184,9 +185,10 @@ fun SettingsItemCard(
 ) {
     Surface(
         modifier = modifier
-            .padding(5.dp),
+            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.primaryContainer,
+        shadowElevation = 5.dp
     ) {
         Row(
             Modifier
@@ -222,15 +224,23 @@ fun SettingsSwitchCard(
     }
 }
 
-private fun exportCSV(directoryUri: Uri, context: Context, entriesList: List<EntryType>){
+private fun exportCSV(directoryUri: Uri, context: Context, entriesList: List<EntryType>) {
     try {
         val fileName = "Log_Backup_${System.currentTimeMillis()}.csv"
         val pickedDir = DocumentFile.fromTreeUri(context, directoryUri)
         val destination = pickedDir!!.createFile("csv", fileName)
-        csvWriter().open(destination?.let { context.contentResolver.openOutputStream(it.uri) }!!){
-            writeRow(listOf("[type]", "[attending name]", "[date]","[age]","[quantity]"))
-            entriesList.forEach {entry ->
-                writeRow(listOf(entry.type,entry.attendingName,entry.entryDate.getFormattedDate(),entry.age,entry.quantity))
+        csvWriter().open(destination?.let { context.contentResolver.openOutputStream(it.uri) }!!) {
+            writeRow(listOf("[type]", "[attending name]", "[date]", "[age]", "[quantity]"))
+            entriesList.forEach { entry ->
+                writeRow(
+                    listOf(
+                        entry.type,
+                        entry.attendingName,
+                        entry.entryDate.getFormattedDate(),
+                        entry.age,
+                        entry.quantity
+                    )
+                )
             }
         }
         Toast.makeText(context, "Exported SuccessFully.", Toast.LENGTH_LONG).show()

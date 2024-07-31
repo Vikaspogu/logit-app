@@ -139,9 +139,10 @@ fun SummaryCard(summary: Summary, modifier: Modifier, navController: NavHostCont
     Surface(
         shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.primaryContainer,
+        shadowElevation = 5.dp,
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
-            .padding(5.dp, 5.dp, 5.dp, 5.dp)
+            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
             .clickable {
                 navController.navigate(
                     "summaryDetails/{typeId}".replace(

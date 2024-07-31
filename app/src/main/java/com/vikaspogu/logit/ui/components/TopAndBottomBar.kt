@@ -69,7 +69,7 @@ fun TopBar(
 
 @Composable
 fun BottomBar(navController: NavHostController) {
-    NavigationBar(modifier = Modifier.clip(shape = MaterialTheme.shapes.small)) {
+    NavigationBar(modifier = Modifier.clip(shape = MaterialTheme.shapes.large)) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         BottomNavigationItem().bottomNavigationItems().forEachIndexed { _, navigationItem ->

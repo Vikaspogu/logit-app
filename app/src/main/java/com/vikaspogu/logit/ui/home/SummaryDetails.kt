@@ -113,7 +113,8 @@ fun SummaryDetailsCard(entry: EntryType) {
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.fillMaxWidth().padding(5.dp)
+        shadowElevation = 5.dp,
+        modifier = Modifier.fillMaxWidth().padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
