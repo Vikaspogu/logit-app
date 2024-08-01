@@ -2,12 +2,12 @@ package com.vikaspogu.logit.ui.type
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,6 +41,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -65,6 +69,28 @@ fun ManageType(
         mutableStateOf("")
     }
     val coroutineScope = rememberCoroutineScope()
+    // Visibility for FAB, could be saved in viewModel
+    var isVisible by remember { mutableStateOf(true) }
+
+    // Nested scroll for control FAB
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                // Hide FAB
+                if (available.y < -1) {
+                    isVisible = false
+                }
+
+                // Show FAB
+                if (available.y > 1) {
+                    isVisible = true
+                }
+
+                return Offset.Zero
+            }
+        }
+    }
+
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
             title = {},
@@ -80,14 +106,22 @@ fun ManageType(
             }
         )
     }, floatingActionButton = {
-        FloatingActionButton(
-            onClick = { openDialog = true },
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+        AnimatedVisibility(
+            visible = isVisible, enter = slideInVertically(initialOffsetY = { it * 2 }),
+            exit = slideOutVertically(targetOffsetY = { it * 2 }),
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = stringResource(id = R.string.add)
-            )
+            FloatingActionButton(
+                onClick = {
+                    openDialog = true
+                    procedureType = ""
+                },
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.add)
+                )
+            }
         }
         if (openDialog)
             AlertDialog(
@@ -143,26 +177,19 @@ fun ManageType(
                 }
             )
     }) { innerPadding ->
-        TypeList(
-            typeList = typeUiState.typeList, contentPadding = innerPadding,
-            modifier = modifier.fillMaxSize(),
-            viewModel
-        )
+        LazyColumn(
+            contentPadding = innerPadding,
+            modifier = modifier.nestedScroll(nestedScrollConnection)
+        ) {
+            item {
+                TypeDetails(
+                    typeUiState.typeList,
+                    modifier,
+                    viewModel
+                )
+            }
+        }
 
-    }
-}
-
-@Composable
-fun TypeList(
-    typeList: List<Type>,
-    contentPadding: PaddingValues,
-    modifier: Modifier,
-    viewModel: ManageTypeViewModel
-) {
-    LazyColumn(
-        modifier = modifier, contentPadding = contentPadding
-    ) {
-        item { TypeDetails(typeList, modifier, viewModel) }
     }
 }
 
@@ -195,7 +222,7 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Surface(
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.primaryContainer,
         shadowElevation = 5.dp,
         modifier = Modifier

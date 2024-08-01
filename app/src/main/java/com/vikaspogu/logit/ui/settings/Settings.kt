@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -186,7 +185,7 @@ fun SettingsItemCard(
     Surface(
         modifier = modifier
             .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.primaryContainer,
         shadowElevation = 5.dp
     ) {
@@ -199,28 +198,6 @@ fun SettingsItemCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             content = content
         )
-    }
-}
-
-@Composable
-fun SettingsSwitchCard(
-    text: String,
-    checked: Boolean,
-    onCheck: (Boolean) -> Unit = {}
-) {
-    SettingsItemCard(
-        onClick = {
-            onCheck(!checked)
-        },
-        vPadding = 10.dp
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Switch(checked = checked, onCheckedChange = {
-            onCheck(it)
-        })
     }
 }
 

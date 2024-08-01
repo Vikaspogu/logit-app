@@ -68,15 +68,10 @@ fun SummaryDetailsScreen(
             }
         })
     }, modifier = modifier.fillMaxSize()) {
-        SummaryDetails(entryList = entryTypeUiState.entryTypeList, modifier = modifier)
-    }
-}
-
-@Composable
-fun SummaryDetails(entryList: List<EntryType>, modifier: Modifier) {
-    LazyColumn {
-        item {
-            SummaryDetailsColumn(entryList, modifier)
+        LazyColumn(modifier=Modifier.padding(top = 20.dp)) {
+            item {
+                SummaryDetailsColumn(entryTypeUiState.entryTypeList, modifier)
+            }
         }
     }
 }
