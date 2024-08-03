@@ -118,7 +118,8 @@ fun SummaryDetailsCard(entry: EntryType) {
                 text = entry.type,
                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.inverseSurface,
             )
             Row(verticalAlignment = Alignment.Bottom) {
                 Icon(
@@ -130,7 +131,7 @@ fun SummaryDetailsCard(entry: EntryType) {
                     modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 0.dp),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.inverseSurface,
                 )
             }
             Row(verticalAlignment = Alignment.Bottom) {
@@ -144,7 +145,8 @@ fun SummaryDetailsCard(entry: EntryType) {
                         append(entry.entryDate.formatDate())
                     },
                     modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 5.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.inverseSurface,
                 )
             }
             Text(
@@ -157,7 +159,8 @@ fun SummaryDetailsCard(entry: EntryType) {
                     append(" quantity")
                 },
                 modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.inverseSurface,
             )
             if(!hideOverFlowingText){
                 Text(
@@ -170,6 +173,7 @@ fun SummaryDetailsCard(entry: EntryType) {
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                    color = MaterialTheme.colorScheme.inverseSurface,
                 )
             }
 
@@ -197,7 +201,7 @@ fun SummaryDetailsCard(entry: EntryType) {
                             id = R.string.hide_notes
                         ), modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.inverseSurface
+                        color = MaterialTheme.colorScheme.inverseSurface,
                     )
                 }
             }

@@ -24,6 +24,7 @@
 - 
 ### Used in the app :
 - Room DB
+- Datastore
 - Kotlin coroutines
 - Kotlin Flows
 - Jetpack Compose
@@ -31,3 +32,4 @@
 ## 🤝 Gratitude and Thanks
 
 Thanks to [mhss1/MyBrain](https://github.com/mhss1/MyBrain) app for lots of inspirations
+[PieChart](https://medium.com/@developerchunk/create-custom-pie-chart-with-animations-in-jetpack-compose-android-studio-kotlin-49cf95ef321e)

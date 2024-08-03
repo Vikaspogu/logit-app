@@ -22,7 +22,7 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) {
             } else {
                 throw it
             }
-        }.map { preferences -> preferences[IS_DARK_THEME] ?: true }
+        }.map { preferences -> preferences[IS_DARK_THEME] ?: false }
 
     private companion object {
         val IS_DARK_THEME = booleanPreferencesKey("is_dark_theme")
