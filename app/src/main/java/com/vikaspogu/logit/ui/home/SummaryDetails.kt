@@ -46,7 +46,6 @@ import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.entry.formatDate
-import com.vikaspogu.logit.ui.theme.slightlyDeemphasizedAlpha
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -131,7 +130,7 @@ fun SummaryDetailsCard(entry: EntryType) {
                     modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 0.dp),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = slightlyDeemphasizedAlpha)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             Row(verticalAlignment = Alignment.Bottom) {

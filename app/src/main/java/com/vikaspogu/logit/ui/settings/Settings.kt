@@ -20,14 +20,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,22 +52,21 @@ import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
 import com.vikaspogu.logit.ui.util.Constants
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 
 @Composable
 fun Settings(navController: NavHostController, modifier: Modifier, viewModel: SettingsViewModel) {
-    Scaffold(
-        topBar = {
-            TopBar(
-                showBackNavigation = false,
-                navController = navController,
-                navDest = NavigationDestinations.Summary
-            )
-        }, bottomBar = {
-            BottomBar(navController = navController)
-        }
-    ) { innerPadding ->
+    Scaffold(topBar = {
+        TopBar(
+            showBackNavigation = false,
+            navController = navController,
+            navDest = NavigationDestinations.Summary
+        )
+    }, bottomBar = {
+        BottomBar(navController = navController)
+    }) { innerPadding ->
         SettingColumn(
             contentPadding = innerPadding,
             modifier = modifier.fillMaxSize(),
@@ -70,6 +76,7 @@ fun Settings(navController: NavHostController, modifier: Modifier, viewModel: Se
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingColumn(
     contentPadding: PaddingValues,
@@ -86,36 +93,54 @@ fun SettingColumn(
             exportCSV(it, context, entriesList.entries)
         }
     }
+    val isDark by viewModel.isDark.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(viewModel.selectedTheme) {
+        viewModel.update_selectedTheme(isDark)
+    }
+
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding,
     ) {
         item {
             Text(
-                modifier = Modifier
-                    .padding(16.dp),
+                modifier = Modifier.padding(16.dp),
                 text = stringResource(id = R.string.settings),
                 style = MaterialTheme.typography.titleLarge
             )
-            SettingsBasicLinkItem(
-                title = R.string.manage_types,
+            SettingsBasicLinkItem(title = R.string.manage_types,
                 icon = R.drawable.ic_code,
                 onClick = {
                     navController.navigate(NavigationDestinations.Types.name)
-                }
-            )
-            SettingsBasicLinkItem(
-                title = R.string.export_csv,
+                })
+            SettingsBasicLinkItem(title = R.string.export_csv,
                 icon = R.drawable.ic_export,
                 onClick = {
                     chooseDirectoryLauncher.launch(null)
-                }
-            )
+                })
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, end = 10.dp, top = 5.dp),
+            ) {
+                SegmentedButton(selected = !viewModel.selectedTheme.value, onClick = {
+                    viewModel.update_selectedTheme(!viewModel.selectedTheme.value)
+                    coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
+                }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
+                    Text(text = stringResource(id = R.string.light_theme),style = MaterialTheme.typography.bodyLarge,)
+                })
+                SegmentedButton(selected = viewModel.selectedTheme.value, onClick = {
+                    viewModel.update_selectedTheme(!viewModel.selectedTheme.value)
+                    coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
+                }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
+                    Text(text = stringResource(id = R.string.dark_theme),style = MaterialTheme.typography.bodyLarge,)
+                })
+            }
         }
         item {
             Text(
-                modifier = Modifier
-                    .padding(16.dp),
+                modifier = Modifier.padding(16.dp),
                 text = stringResource(id = R.string.about),
                 style = MaterialTheme.typography.titleLarge
             )
@@ -138,24 +163,20 @@ fun SettingColumn(
 
 @Composable
 fun SettingsBasicLinkItem(
-    @StringRes
-    title: Int,
+    @StringRes title: Int,
     subtitle: String = "",
-    @DrawableRes
-    icon: Int,
+    @DrawableRes icon: Int,
     link: String = "",
     onClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    SettingsItemCard(
-        onClick = {
-            if (link.isNotBlank()) {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse(link)
-                context.startActivity(intent)
-            } else onClick()
-        }
-    ) {
+    SettingsItemCard(onClick = {
+        if (link.isNotBlank()) {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(link)
+            context.startActivity(intent)
+        } else onClick()
+    }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = icon),
@@ -165,11 +186,13 @@ fun SettingsBasicLinkItem(
             Text(
                 text = stringResource(id = title),
                 style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.inverseSurface
             )
         }
         Text(
             text = subtitle,
             style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.inverseSurface
         )
     }
 }
@@ -183,8 +206,7 @@ fun SettingsItemCard(
     content: @Composable RowScope.() -> Unit,
 ) {
     Surface(
-        modifier = modifier
-            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
+        modifier = modifier.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
         shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.primaryContainer,
         shadowElevation = 5.dp
@@ -196,8 +218,7 @@ fun SettingsItemCard(
                 .padding(horizontal = hPadding, vertical = vPadding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            content = content
-        )
+            content = content)
     }
 }
 

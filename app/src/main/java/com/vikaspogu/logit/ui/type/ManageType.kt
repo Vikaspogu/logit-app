@@ -130,7 +130,8 @@ fun ManageType(
                 title = {
                     Text(
                         stringResource(R.string.add_new_type_confirmation_title),
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.inverseSurface
                     )
                 },
                 text = {
@@ -142,7 +143,8 @@ fun ManageType(
                         label = {
                             Text(
                                 text = stringResource(id = R.string.procedure_type),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.inverseSurface
                             )
                         }
                     )
@@ -200,7 +202,8 @@ fun TypeDetails(typeList: List<Type>, modifier: Modifier, viewModel: ManageTypeV
             modifier = Modifier
                 .padding(16.dp),
             text = stringResource(id = R.string.manage_types),
-            style = MaterialTheme.typography.headlineLarge
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.inverseSurface
         )
         for (type in typeList) {
             TypeCard(
@@ -240,7 +243,8 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                 Text(
                     text = type.type,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = modifier.weight(1f)
+                    modifier = modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.inverseSurface
                 )
                 IconButton(onClick = { editable = true }) {
                     Icon(

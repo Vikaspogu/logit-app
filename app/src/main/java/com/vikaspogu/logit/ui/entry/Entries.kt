@@ -53,7 +53,6 @@ import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
-import com.vikaspogu.logit.ui.theme.slightlyDeemphasizedAlpha
 import com.vikaspogu.logit.ui.util.Constants
 import kotlinx.coroutines.launch
 
@@ -136,8 +135,7 @@ private fun EntriesCard(
         mutableStateOf(false)
     }
 
-    Surface(
-        shape = MaterialTheme.shapes.large,
+    Surface(shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.primaryContainer,
         shadowElevation = 5.dp,
         modifier = Modifier
@@ -151,8 +149,7 @@ private fun EntriesCard(
                         )
                         .replace(oldValue = "{action}", newValue = Constants.EDIT)
                 )
-            }
-    ) {
+            }) {
         Row(
             modifier = modifier.animateContentSize(
                 animationSpec = spring(
@@ -167,7 +164,8 @@ private fun EntriesCard(
                     text = entry.type,
                     modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.inverseSurface
                 )
                 Row(verticalAlignment = Alignment.Bottom) {
                     Icon(
@@ -181,7 +179,7 @@ private fun EntriesCard(
                             .padding(5.dp, 12.dp, 12.dp, 0.dp),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = slightlyDeemphasizedAlpha)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
                 Row(verticalAlignment = Alignment.Bottom) {
@@ -195,7 +193,8 @@ private fun EntriesCard(
                             append(entry.entryDate.formatDate())
                         },
                         modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 5.dp),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.inverseSurface
                     )
                 }
                 Text(
@@ -208,7 +207,8 @@ private fun EntriesCard(
                         append(" quantity")
                     },
                     modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.inverseSurface
                 )
                 if (!hideOverFlowingText) {
                     Text(
@@ -221,6 +221,7 @@ private fun EntriesCard(
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                        color = MaterialTheme.colorScheme.inverseSurface
                     )
                 }
 
@@ -230,6 +231,7 @@ private fun EntriesCard(
                             text = entry.notes,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                            color = MaterialTheme.colorScheme.inverseSurface
                         )
                     }
                     Box(
@@ -246,7 +248,8 @@ private fun EntriesCard(
                         Text(
                             text = if (!expanded) stringResource(id = R.string.show_notes) else stringResource(
                                 id = R.string.hide_notes
-                            ), modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
+                            ),
+                            modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
@@ -271,7 +274,9 @@ private fun EntriesCard(
                     Text(
                         stringResource(
                             R.string.delete_confirmation_message
-                        ), style = MaterialTheme.typography.bodyMedium
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.inverseSurface
                     )
                 },
                 confirmButton = {
@@ -286,7 +291,8 @@ private fun EntriesCard(
                     ) {
                         Text(
                             stringResource(R.string.delete),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.inverseSurface
                         )
                     }
                 },
@@ -296,7 +302,8 @@ private fun EntriesCard(
                     }) {
                         Text(
                             stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.inverseSurface
                         )
                     }
                 })
