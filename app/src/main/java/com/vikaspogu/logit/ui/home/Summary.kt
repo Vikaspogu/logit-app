@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Summary
@@ -52,7 +53,7 @@ import com.vikaspogu.logit.ui.util.Constants
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryScreen(
-    navController: NavHostController, modifier: Modifier, viewModel: SummaryViewModel
+    navController: NavHostController, modifier: Modifier, viewModel: SummaryViewModel = hiltViewModel()
 ) {
     val summaryUiState by viewModel.summaryUiState.collectAsState()
     Scaffold(topBar = {

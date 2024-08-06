@@ -2,7 +2,7 @@
 
 ### Open-source, opinionated mobile app for logging your procedures 
 
-<div align="left">
+<div>
 <img src = "./docs/images/image1.jpeg" width ="160" />
 <img src = "./docs/images/image2.jpeg" width ="160" />
 <img src = "./docs/images/image3.jpeg" width ="160" />
@@ -24,7 +24,8 @@
 - 
 ### Used in the app :
 - Room DB
-- Datastore
+- Hilt
+- Preferences DataStore
 - Kotlin coroutines
 - Kotlin Flows
 - Jetpack Compose
@@ -33,3 +34,4 @@
 
 Thanks to [mhss1/MyBrain](https://github.com/mhss1/MyBrain) app for lots of inspirations
 [PieChart](https://medium.com/@developerchunk/create-custom-pie-chart-with-animations-in-jetpack-compose-android-studio-kotlin-49cf95ef321e)
+[DataStore DI](https://medium.com/androiddevelopers/datastore-and-dependency-injection-ea32b95704e3)

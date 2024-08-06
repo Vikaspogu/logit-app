@@ -5,8 +5,9 @@ import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.data.model.Summary
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class OfflineEntryRepository(private val entryDao: EntryDao) : EntryRepository {
+class OfflineEntryRepository @Inject constructor(private val entryDao: EntryDao) : EntryRepository {
     override fun getSummary(): Flow<List<Summary>> = entryDao.getSummary()
     override fun getEntries(): Flow<List<Entry>> = entryDao.getAllEntries()
     override fun getEntriesWithTypes(): Flow<List<EntryType>> = entryDao.getAllEntriesWithTypes()

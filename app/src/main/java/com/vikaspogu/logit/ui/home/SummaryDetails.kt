@@ -41,6 +41,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.EntryType
@@ -52,7 +53,7 @@ import com.vikaspogu.logit.ui.entry.formatDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryDetailsScreen(
-    navController: NavHostController, modifier: Modifier, viewModel: SummaryDetailsViewModel
+    navController: NavHostController, modifier: Modifier, viewModel: SummaryDetailsViewModel = hiltViewModel()
 ) {
     val entryTypeUiState by viewModel.entryTypeUiState.collectAsState()
     Scaffold(topBar = {
@@ -108,7 +109,9 @@ fun SummaryDetailsCard(entry: EntryType) {
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.primaryContainer,
         shadowElevation = 5.dp,
-        modifier = Modifier.fillMaxWidth().padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),

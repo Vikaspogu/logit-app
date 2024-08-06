@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("com.google.devtools.ksp")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -74,10 +77,19 @@ dependencies {
 
     //Room
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.core.ktx.v1120)
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation(libs.androidx.room.ktx)
     implementation(libs.kotlin.csv.jvm)
 
+    //Dagger - Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
     implementation(libs.androidx.datastore.preferences)
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }

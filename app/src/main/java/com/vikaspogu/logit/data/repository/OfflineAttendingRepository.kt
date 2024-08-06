@@ -3,8 +3,9 @@ package com.vikaspogu.logit.data.repository
 import com.vikaspogu.logit.data.dao.AttendingDao
 import com.vikaspogu.logit.data.model.Attending
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class OfflineAttendingRepository(private val attendingDao: AttendingDao): AttendingRepository {
+class OfflineAttendingRepository @Inject constructor(private val attendingDao: AttendingDao): AttendingRepository {
     override fun getAllAttending(): Flow<List<Attending>> = attendingDao.getAllAttending()
 
     override suspend fun insertAttending(attending: Attending) = attendingDao.insert(attending)

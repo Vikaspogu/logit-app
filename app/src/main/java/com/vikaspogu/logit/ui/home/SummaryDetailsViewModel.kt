@@ -2,21 +2,18 @@ package com.vikaspogu.logit.ui.home
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.vikaspogu.logit.LogItApplication
-import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.data.repository.EntryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
-class SummaryDetailsViewModel(savedStateHandle: SavedStateHandle, private val entryRepository: EntryRepository) : ViewModel() {
+@HiltViewModel
+class SummaryDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle, entryRepository: EntryRepository) : ViewModel() {
 
     private val typeId: String = checkNotNull(savedStateHandle["typeId"])
 
@@ -30,13 +27,6 @@ class SummaryDetailsViewModel(savedStateHandle: SavedStateHandle, private val en
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
-        val factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application =
-                    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as LogItApplication)
-                SummaryDetailsViewModel(this.createSavedStateHandle(),application.entryRepository)
-            }
-        }
     }
 }
 

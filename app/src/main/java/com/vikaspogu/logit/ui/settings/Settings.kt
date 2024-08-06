@@ -28,7 +28,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.vikaspogu.logit.BuildConfig
@@ -57,7 +57,7 @@ import java.util.Locale
 
 
 @Composable
-fun Settings(navController: NavHostController, modifier: Modifier, viewModel: SettingsViewModel) {
+fun Settings(navController: NavHostController, modifier: Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
     Scaffold(topBar = {
         TopBar(
             showBackNavigation = false,
@@ -96,7 +96,7 @@ fun SettingColumn(
     val isDark by viewModel.isDark.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(viewModel.selectedTheme) {
-        viewModel.update_selectedTheme(isDark)
+        viewModel.updateSelectedTheme(isDark)
     }
 
     LazyColumn(
@@ -125,16 +125,16 @@ fun SettingColumn(
                     .padding(start = 10.dp, end = 10.dp, top = 5.dp),
             ) {
                 SegmentedButton(selected = !viewModel.selectedTheme.value, onClick = {
-                    viewModel.update_selectedTheme(!viewModel.selectedTheme.value)
+                    viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
                     coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
                 }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
-                    Text(text = stringResource(id = R.string.light_theme),style = MaterialTheme.typography.bodyLarge,)
+                    Text(text = stringResource(id = R.string.light_theme),style = MaterialTheme.typography.bodyLarge)
                 })
                 SegmentedButton(selected = viewModel.selectedTheme.value, onClick = {
-                    viewModel.update_selectedTheme(!viewModel.selectedTheme.value)
+                    viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
                     coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
                 }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
-                    Text(text = stringResource(id = R.string.dark_theme),style = MaterialTheme.typography.bodyLarge,)
+                    Text(text = stringResource(id = R.string.dark_theme),style = MaterialTheme.typography.bodyLarge)
                 })
             }
         }

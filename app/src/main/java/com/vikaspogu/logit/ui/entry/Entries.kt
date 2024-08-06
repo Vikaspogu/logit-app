@@ -47,6 +47,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.EntryType
@@ -58,7 +59,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EntriesScreen(
-    navController: NavHostController, modifier: Modifier, viewModel: EntriesViewModel
+    navController: NavHostController, modifier: Modifier, viewModel: EntriesViewModel = hiltViewModel()
 ) {
     val entriesUiState by viewModel.entriesUiState.collectAsState()
     Scaffold(topBar = {

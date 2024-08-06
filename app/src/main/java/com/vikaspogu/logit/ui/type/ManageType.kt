@@ -48,6 +48,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Type
@@ -58,8 +59,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ManageType(
     navController: NavHostController,
-    viewModel: ManageTypeViewModel,
-    modifier: Modifier
+    modifier: Modifier,
+    viewModel: ManageTypeViewModel = hiltViewModel(),
 ) {
     val typeUiState by viewModel.typeUiState.collectAsState()
     var openDialog by remember {

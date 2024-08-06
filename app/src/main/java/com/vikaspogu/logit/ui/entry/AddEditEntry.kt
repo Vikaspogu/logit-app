@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Attending
@@ -65,8 +66,8 @@ import java.util.Locale
 @Composable
 fun AddEditEntry(
     navController: NavHostController,
-    viewModel: AddEntryViewModel,
-    modifier: Modifier
+    modifier: Modifier,
+    viewModel: AddEntryViewModel = hiltViewModel(),
 ) {
     Scaffold(topBar = {
         TopBar(true, navController, NavigationDestinations.Summary)
