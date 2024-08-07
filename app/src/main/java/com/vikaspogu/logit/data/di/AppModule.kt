@@ -19,6 +19,7 @@ import com.vikaspogu.logit.data.repository.OfflineAttendingRepository
 import com.vikaspogu.logit.data.repository.OfflineEntryRepository
 import com.vikaspogu.logit.data.repository.OfflineTypeRepository
 import com.vikaspogu.logit.data.repository.TypeRepository
+import com.vikaspogu.logit.data.repository.WorkerManagerReminderRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -64,6 +65,10 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTypeRepository(typeDao: TypeDao): TypeRepository = OfflineTypeRepository(typeDao)
+
+    @Singleton
+    @Provides
+    fun provideWorkerManagerReminderRepository(@ApplicationContext context: Context): WorkerManagerReminderRepository = WorkerManagerReminderRepository(context)
 
     @Singleton
     @Provides

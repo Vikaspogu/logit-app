@@ -3,6 +3,7 @@ package com.vikaspogu.logit.ui.settings
 import android.content.Context
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,16 +12,20 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,11 +34,18 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +53,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -52,12 +65,17 @@ import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
 import com.vikaspogu.logit.ui.util.Constants
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 
 @Composable
-fun Settings(navController: NavHostController, modifier: Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
+fun Settings(
+    navController: NavHostController,
+    modifier: Modifier,
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
     Scaffold(topBar = {
         TopBar(
             showBackNavigation = false,
@@ -94,7 +112,15 @@ fun SettingColumn(
         }
     }
     val isDark by viewModel.isDark.collectAsState()
+    val selectedTime by viewModel.reminderTime.collectAsState()
+    val selectedDays by viewModel.reminderDays.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    var openDialog by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(viewModel.selectedTime) {
+        viewModel.updateSelectedTime(selectedTime)
+    }
     LaunchedEffect(viewModel.selectedTheme) {
         viewModel.updateSelectedTheme(isDark)
     }
@@ -119,6 +145,23 @@ fun SettingColumn(
                 onClick = {
                     chooseDirectoryLauncher.launch(null)
                 })
+            SettingsBasicLinkItem(title = R.string.reminders,
+                icon = R.drawable.ic_notification,
+                onClick = {
+                    openDialog = true
+                })
+
+            when {
+                openDialog -> {
+                    DialogWithReminders(
+                        onDismissRequest = { openDialog = false },
+                        days = selectedDays.reminderDaysSet,
+                        onConfirmation = { openDialog = false },
+                        viewModel = viewModel,
+                        coroutineScope = coroutineScope
+                    )
+                }
+            }
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,13 +171,19 @@ fun SettingColumn(
                     viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
                     coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
                 }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
-                    Text(text = stringResource(id = R.string.light_theme),style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = stringResource(id = R.string.light_theme),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 })
                 SegmentedButton(selected = viewModel.selectedTheme.value, onClick = {
                     viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
                     coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
                 }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
-                    Text(text = stringResource(id = R.string.dark_theme),style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = stringResource(id = R.string.dark_theme),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 })
             }
         }
@@ -197,6 +246,108 @@ fun SettingsBasicLinkItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogWithReminders(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    days: Set<String>,
+    viewModel: SettingsViewModel,
+    coroutineScope: CoroutineScope
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+
+        val newDays = days.toMutableSet()
+        val weekDays =
+            listOf(
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+            )
+        val currentTime =
+            Calendar.getInstance().apply { timeInMillis = viewModel.selectedTime.value }
+        val timePickerState = rememberTimePickerState(
+            initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
+            initialMinute = currentTime.get(Calendar.MINUTE),
+            is24Hour = false,
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(650.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.select_days_for_reminder),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                weekDays.forEachIndexed { _, day ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = days.contains(day),
+                            onCheckedChange = {
+
+                                if (it) {
+                                    newDays.add(day)
+                                } else {
+                                    newDays.remove(day)
+                                }
+                                coroutineScope.launch {
+                                    viewModel.saveReminderDaysPreferences(
+                                        newDays
+                                    )
+                                }
+
+                            }
+                        )
+                        Text(text = day)
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+
+                TimeInput(
+                    state = timePickerState,
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    TextButton(
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text(stringResource(id = R.string.cancel))
+                    }
+                    TextButton(
+                        onClick = {
+                            onConfirmation()
+                            coroutineScope.launch {
+                                viewModel.saveReminderTimePreferences(getTimeInMillis(timePickerState))
+                                viewModel.saveScheduleReminder(newDays,getTimeInMillis(timePickerState))
+                            }
+                        },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text(stringResource(id = R.string.save))
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun SettingsItemCard(
     modifier: Modifier = Modifier,
@@ -250,4 +401,15 @@ private fun exportCSV(directoryUri: Uri, context: Context, entriesList: List<Ent
 private fun Long.getFormattedDate(): String {
     val sdf = SimpleDateFormat("EEE, MMM dd, yyyy", Locale.getDefault())
     return sdf.format(this)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+fun getTimeInMillis(state: TimePickerState): Long {
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, state.hour)
+        set(Calendar.MINUTE, state.minute)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+    return calendar.timeInMillis
 }

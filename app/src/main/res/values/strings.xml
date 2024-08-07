@@ -35,4 +35,7 @@
     <string name="linear_layout">Linear Layout</string>
     <string name="pie_layout">Pie Layout</string>
     <string name="patient_list">Patient List</string>
+    <string name="reminders">Reminders</string>
+    <string name="select_days_for_reminder">Select Days for Reminder</string>
+    <string name="reminder_message">Reminder to LogIt!</string>
 </resources>
