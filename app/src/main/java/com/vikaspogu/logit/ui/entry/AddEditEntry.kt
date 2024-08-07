@@ -109,10 +109,8 @@ fun AddEditForm(
     if (addEntry.gender.isEmpty()) {
         addEntry.gender = "Male"
     }
-    LaunchedEffect(addEntry.gender) {
+    LaunchedEffect(true) {
         viewModel.updateSelectedGender(addEntry.gender)
-    }
-    LaunchedEffect(addEntry.entryDate) {
         viewModel.updateSelectedDate(addEntry.entryDate)
     }
     val radioOptions = listOf("Male", "Female")

@@ -80,7 +80,7 @@ fun PieChart(
     )
 
     // to play the animation only once when the function is Created or Recomposed
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(true) {
         animationPlayed = true
     }
 

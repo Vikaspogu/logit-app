@@ -118,10 +118,8 @@ fun SettingColumn(
     var openDialog by remember {
         mutableStateOf(false)
     }
-    LaunchedEffect(viewModel.selectedTime) {
+    LaunchedEffect(true) {
         viewModel.updateSelectedTime(selectedTime)
-    }
-    LaunchedEffect(viewModel.selectedTheme) {
         viewModel.updateSelectedTheme(isDark)
     }
 
