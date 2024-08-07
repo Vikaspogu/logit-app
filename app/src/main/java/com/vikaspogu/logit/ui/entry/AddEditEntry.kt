@@ -109,8 +109,13 @@ fun AddEditForm(
     if (addEntry.gender.isEmpty()) {
         addEntry.gender = "Male"
     }
+    LaunchedEffect(addEntry.gender) {
+        viewModel.updateSelectedGender(addEntry.gender)
+    }
+    LaunchedEffect(addEntry.entryDate) {
+        viewModel.updateSelectedDate(addEntry.entryDate)
+    }
     val radioOptions = listOf("Male", "Female")
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(addEntry.gender) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -145,10 +150,10 @@ fun AddEditForm(
                     Modifier
                         .height(56.dp)
                         .selectable(
-                            selected = (text == addEntry.gender),
+                            selected = (text == viewModel.selectedGender.value),
                             onClick = {
-                                onOptionSelected(text)
                                 addEntry.gender = text
+                                viewModel.updateSelectedGender(text)
                             },
                             role = Role.RadioButton
                         )
@@ -156,7 +161,7 @@ fun AddEditForm(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = (text == selectedOption),
+                        selected = (text == viewModel.selectedGender.value),
                         onClick = null
                     )
                     Text(
@@ -198,7 +203,7 @@ fun AddEditForm(
             horizontalArrangement = Arrangement.Center
         ) {
             OutlinedTextField(
-                value = addEntry.entryDate.formatDate(),
+                value = viewModel.selectedDate.value.formatDate(),
                 onValueChange = { },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = true,
@@ -211,9 +216,10 @@ fun AddEditForm(
                 trailingIcon = {
                     IconButton(onClick = {
                         showDatePicker(
-                            Calendar.getInstance().apply { timeInMillis = addEntry.entryDate },
+                            Calendar.getInstance().apply { timeInMillis = viewModel.selectedDate.value },
                             context,
                             onDateSelected = {
+                                viewModel.updateSelectedDate(it)
                                 addEntry.entryDate = it
                             }
                         )
@@ -575,6 +581,7 @@ private fun showDatePicker(
             tempDate[Calendar.YEAR] = year
             tempDate[Calendar.MONTH] = month
             tempDate[Calendar.DAY_OF_MONTH] = day
+            onDateSelected(tempDate.timeInMillis)
         },
         date[Calendar.YEAR],
         date[Calendar.MONTH],

@@ -47,6 +47,18 @@ class AddEntryViewModel @Inject constructor(
         _selectedAttending.value = text
     }
 
+    private val _selectedGender = mutableStateOf("Male")
+    var selectedGender: State<String> = _selectedGender
+    fun updateSelectedGender(text: String) {
+        _selectedGender.value = text
+    }
+
+    private val _selectedDate = mutableStateOf(0L)
+    var selectedDate: State<Long> = _selectedDate
+    fun updateSelectedDate(date: Long) {
+        _selectedDate.value = date
+    }
+
     val typeUiState: StateFlow<TypesUiState> =
         typeRepository.getAllTypes().map { TypesUiState(it) }.stateIn(
             scope = viewModelScope,
