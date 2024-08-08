@@ -2,6 +2,7 @@ package com.vikaspogu.logit.ui.entry
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,10 +55,10 @@ class AddEntryViewModel @Inject constructor(
         _selectedGender.value = text
     }
 
-    private val _selectedDate = mutableStateOf(0L)
+    private val _selectedDate = mutableLongStateOf(Calendar.getInstance().timeInMillis)
     var selectedDate: State<Long> = _selectedDate
     fun updateSelectedDate(date: Long) {
-        _selectedDate.value = date
+        _selectedDate.longValue = date
     }
 
     val typeUiState: StateFlow<TypesUiState> =
@@ -81,6 +83,8 @@ class AddEntryViewModel @Inject constructor(
         viewModelScope.launch {
             addEntryUiState = entryRepository.getEntry(entryId.toInt()).filterNotNull().first()
                 .toAddEntryUiState()
+            _selectedGender.value = addEntryUiState.addEntry.gender
+            _selectedDate.longValue = addEntryUiState.addEntry.entryDate
         }
     }
 

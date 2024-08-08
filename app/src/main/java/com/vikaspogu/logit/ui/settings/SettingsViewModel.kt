@@ -12,8 +12,10 @@ import com.vikaspogu.logit.ui.entry.EntriesUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -21,7 +23,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     entryRepository: EntryRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val workerManagerReminderRepository : WorkerManagerReminderRepository
+    private val workerManagerReminderRepository: WorkerManagerReminderRepository
 ) : ViewModel() {
 
     val entriesUiState: StateFlow<EntriesUiState> = entryRepository.getEntriesWithTypes().map {
@@ -44,6 +46,13 @@ class SettingsViewModel @Inject constructor(
         _selectedTime.value = selectedTime
     }
 
+    init {
+        viewModelScope.launch {
+            _selectedTheme.value = userPreferencesRepository.isDarkTheme.first()
+            _selectedTime.value = userPreferencesRepository.selectedTime.first()
+        }
+    }
+
     val isDark: StateFlow<Boolean> = userPreferencesRepository.isDarkTheme.map { it }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -57,12 +66,6 @@ class SettingsViewModel @Inject constructor(
             initialValue = ReminderDaysUiState()
         )
 
-    val reminderTime: StateFlow<Long> = userPreferencesRepository.selectedTime.map { it }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = 0L
-    )
-
     suspend fun saveThemePreferences(isDarkTheme: Boolean) {
         userPreferencesRepository.saveThemePreferences(isDarkTheme)
     }
@@ -75,8 +78,8 @@ class SettingsViewModel @Inject constructor(
         userPreferencesRepository.saveReminderTime(reminderTime)
     }
 
-    suspend fun saveScheduleReminder(reminderDays: Set<String>, reminderTime: Long){
-        workerManagerReminderRepository.scheduleReminder(reminderDays,reminderTime)
+    suspend fun saveScheduleReminder(reminderDays: Set<String>, reminderTime: Long) {
+        workerManagerReminderRepository.scheduleReminder(reminderDays, reminderTime)
     }
 
     companion object {

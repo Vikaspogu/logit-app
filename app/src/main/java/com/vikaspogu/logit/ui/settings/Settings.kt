@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,12 +35,10 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -111,16 +110,10 @@ fun SettingColumn(
             exportCSV(it, context, entriesList.entries)
         }
     }
-    val isDark by viewModel.isDark.collectAsState()
-    val selectedTime by viewModel.reminderTime.collectAsState()
     val selectedDays by viewModel.reminderDays.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var openDialog by remember {
         mutableStateOf(false)
-    }
-    LaunchedEffect(true) {
-        viewModel.updateSelectedTime(selectedTime)
-        viewModel.updateSelectedTheme(isDark)
     }
 
     LazyColumn(
@@ -322,23 +315,28 @@ fun DialogWithReminders(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    TextButton(
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
                         onClick = { onDismissRequest() },
-                        modifier = Modifier.padding(8.dp),
                     ) {
-                        Text(stringResource(id = R.string.cancel))
+                        Text(
+                            stringResource(R.string.cancel),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
-                    TextButton(
-                        onClick = {
-                            onConfirmation()
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
+                        onClick = { onConfirmation()
                             coroutineScope.launch {
                                 viewModel.saveReminderTimePreferences(getTimeInMillis(timePickerState))
                                 viewModel.saveScheduleReminder(newDays,getTimeInMillis(timePickerState))
-                            }
-                        },
-                        modifier = Modifier.padding(8.dp),
+                            } },
                     ) {
-                        Text(stringResource(id = R.string.save))
+                        Text(
+                            stringResource(R.string.save),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
