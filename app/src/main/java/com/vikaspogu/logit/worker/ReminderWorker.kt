@@ -1,55 +1,39 @@
 package com.vikaspogu.logit.worker
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.ui.util.Constants.CHANNEL_ID
+import com.vikaspogu.logit.ui.util.Constants.NOTIFICATION_CHANNEL_NAME
 import com.vikaspogu.logit.ui.util.Constants.NOTIFICATION_ID
 import com.vikaspogu.logit.ui.util.Constants.NOTIFICATION_TITLE
-import com.vikaspogu.logit.ui.util.Constants.VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION
-import com.vikaspogu.logit.ui.util.Constants.VERBOSE_NOTIFICATION_CHANNEL_NAME
 
 class ReminderWorker(context: Context,workerParameters: WorkerParameters): CoroutineWorker(context,workerParameters) {
     override suspend fun doWork(): Result {
-        makeReminderNotification(context = applicationContext)
+        sendNotification(context = applicationContext)
         return Result.success()
     }
 
 }
 
-@SuppressLint("MissingPermission")
-fun makeReminderNotification(context: Context){
+private fun sendNotification(context: Context) {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        val importance = NotificationManager.IMPORTANCE_HIGH
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            VERBOSE_NOTIFICATION_CHANNEL_NAME,
-            importance
-        )
-        channel.description = VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION
-
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
-
-        notificationManager?.createNotificationChannel(channel)
+        val channel = NotificationChannel(CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
+        notificationManager.createNotificationChannel(channel)
     }
 
-    val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
+    val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
         .setContentTitle(NOTIFICATION_TITLE)
         .setContentText(context.getString(R.string.reminder_message))
+        .setSmallIcon(R.drawable.ic_notification)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
-        .setVibrate(LongArray(0))
-        .setAutoCancel(true)
 
-    NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
+    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
 }

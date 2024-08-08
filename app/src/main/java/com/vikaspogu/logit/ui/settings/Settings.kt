@@ -1,7 +1,9 @@
 package com.vikaspogu.logit.ui.settings
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.net.Uri
@@ -53,6 +55,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -115,6 +118,14 @@ fun SettingColumn(
     var openDialog by remember {
         mutableStateOf(false)
     }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                openDialog = true
+            }
+        }
+    )
 
     LazyColumn(
         modifier = modifier,
@@ -139,7 +150,17 @@ fun SettingColumn(
             SettingsBasicLinkItem(title = R.string.reminders,
                 icon = R.drawable.ic_notification,
                 onClick = {
-                    openDialog = true
+                    val permission = Manifest.permission.POST_NOTIFICATIONS
+                    when {
+                        ContextCompat.checkSelfPermission(
+                            context, permission
+                        ) == PackageManager.PERMISSION_GRANTED -> {
+                            openDialog = true
+                        }
+                        else -> {
+                            launcher.launch(permission)
+                        }
+                    }
                 })
 
             when {
@@ -327,11 +348,21 @@ fun DialogWithReminders(
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         shape = RoundedCornerShape(25.dp),
-                        onClick = { onConfirmation()
+                        onClick = {
+                            onConfirmation()
                             coroutineScope.launch {
-                                viewModel.saveReminderTimePreferences(getTimeInMillis(timePickerState))
-                                viewModel.saveScheduleReminder(newDays,getTimeInMillis(timePickerState))
-                            } },
+                                viewModel.updateSelectedTime(getTimeInMillis(timePickerState))
+                                viewModel.saveReminderTimePreferences(
+                                    getTimeInMillis(
+                                        timePickerState
+                                    )
+                                )
+                                viewModel.saveScheduleReminder(
+                                    newDays,
+                                    getTimeInMillis(timePickerState)
+                                )
+                            }
+                        },
                     ) {
                         Text(
                             stringResource(R.string.save),
