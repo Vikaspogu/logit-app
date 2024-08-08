@@ -43,13 +43,13 @@ class SettingsViewModel @Inject constructor(
     private val _selectedTime = mutableLongStateOf(0L)
     var selectedTime: MutableState<Long> = _selectedTime
     fun updateSelectedTime(selectedTime: Long) {
-        _selectedTime.value = selectedTime
+        _selectedTime.longValue = selectedTime
     }
 
     init {
         viewModelScope.launch {
             _selectedTheme.value = userPreferencesRepository.isDarkTheme.first()
-            _selectedTime.value = userPreferencesRepository.selectedTime.first()
+            _selectedTime.longValue = userPreferencesRepository.selectedTime.first()
         }
     }
 
@@ -66,20 +66,28 @@ class SettingsViewModel @Inject constructor(
             initialValue = ReminderDaysUiState()
         )
 
-    suspend fun saveThemePreferences(isDarkTheme: Boolean) {
-        userPreferencesRepository.saveThemePreferences(isDarkTheme)
+    fun saveThemePreferences(isDarkTheme: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveThemePreferences(isDarkTheme)
+        }
     }
 
-    suspend fun saveReminderDaysPreferences(days: Set<String>) {
-        userPreferencesRepository.saveReminderDays(days)
+    fun saveReminderDaysPreferences(days: Set<String>) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveReminderDays(days)
+        }
     }
 
-    suspend fun saveReminderTimePreferences(reminderTime: Long) {
-        userPreferencesRepository.saveReminderTime(reminderTime)
+    fun saveReminderTimePreferences(reminderTime: Long) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveReminderTime(reminderTime)
+        }
     }
 
-    suspend fun saveScheduleReminder(reminderDays: Set<String>, reminderTime: Long) {
-        workerManagerReminderRepository.scheduleReminder(reminderDays, reminderTime)
+    fun saveScheduleReminder(reminderDays: Set<String>, reminderTime: Long) {
+        viewModelScope.launch {
+            workerManagerReminderRepository.scheduleReminder(reminderDays, reminderTime)
+        }
     }
 
     companion object {

@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -37,11 +38,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +52,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Attending
@@ -60,7 +60,6 @@ import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.TopBar
 import com.vikaspogu.logit.ui.util.Constants
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
@@ -102,14 +101,15 @@ fun AddEditForm(
     addEntry: AddEntry,
     viewModel: AddEntryViewModel
 ) {
-    val typesUiState by viewModel.typeUiState.collectAsState()
-    val attendingUiState by viewModel.attendingUiState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
+    val typesUiState by viewModel.typeUiState.collectAsStateWithLifecycle()
+    val attendingUiState by viewModel.attendingUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     if (addEntry.gender.isEmpty()) {
         addEntry.gender = "Male"
     }
     val radioOptions = listOf("Male", "Female")
+    val isButtonEnabled =
+        addEntry.age.isNotEmpty() && addEntry.quantity.isNotEmpty() && addEntry.gender.isNotEmpty() && viewModel.selectedAttending.value.isNotEmpty() && viewModel.selectedProcedure.value.isNotEmpty()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -133,7 +133,7 @@ fun AddEditForm(
                     text = stringResource(R.string.age),
                     style = MaterialTheme.typography.bodyMedium
                 )
-            }
+            },
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -210,7 +210,8 @@ fun AddEditForm(
                 trailingIcon = {
                     IconButton(onClick = {
                         showDatePicker(
-                            Calendar.getInstance().apply { timeInMillis = viewModel.selectedDate.value },
+                            Calendar.getInstance()
+                                .apply { timeInMillis = viewModel.selectedDate.value },
                             context,
                             onDateSelected = {
                                 viewModel.updateSelectedDate(it)
@@ -237,10 +238,9 @@ fun AddEditForm(
         Spacer(Modifier.height(20.dp))
         if (viewModel.action == Constants.ADD) {
             Button(
+                enabled = isButtonEnabled,
                 onClick = {
-                    coroutineScope.launch {
-                        viewModel.saveEntry()
-                    }
+                    viewModel.saveEntry()
                     navController.navigate(NavigationDestinations.Summary.name)
                 }, modifier = Modifier
                     .fillMaxWidth()
@@ -250,10 +250,9 @@ fun AddEditForm(
             }
         } else if (viewModel.action == Constants.EDIT) {
             Button(
+                enabled = isButtonEnabled,
                 onClick = {
-                    coroutineScope.launch {
-                        viewModel.updateEntry()
-                    }
+                    viewModel.updateEntry()
                     navController.navigate(NavigationDestinations.Entries.name)
                 }, modifier = Modifier
                     .fillMaxWidth()
@@ -280,9 +279,6 @@ fun DropdownAttending(
     var attendingName by remember {
         mutableStateOf("")
     }
-
-    val coroutineScope = rememberCoroutineScope()
-
     val editType = items.find { it.id == addEntry.attendingId }
     if (editType?.name?.isNotEmpty() == true) {
         LaunchedEffect(viewModel.selectedAttending) {
@@ -301,7 +297,21 @@ fun DropdownAttending(
             value = viewModel.selectedAttending.value,
             label = { Text(text = label, style = MaterialTheme.typography.bodyMedium) },
             onValueChange = { viewModel.updateSelectedAttending(it) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (viewModel.selectedAttending.value.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.updateSelectedAttending("") }) {
+                            Icon(imageVector = Icons.Outlined.Close, contentDescription = stringResource(
+                                id = R.string.cancel
+                            ))
+                        }
+                    }
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            },
         )
 
         val filteredOptions =
@@ -310,25 +320,6 @@ fun DropdownAttending(
             expanded = expanded,
             onDismissRequest = { },
         ) {
-            if (filteredOptions.isEmpty()) {
-                IconButton(onClick = { openDialog = true }, Modifier.fillMaxWidth()) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Add, contentDescription = stringResource(
-                                id = R.string.add
-                            )
-                        )
-                        Text(
-                            text = stringResource(R.string.add),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-
             filteredOptions.forEach { item ->
                 DropdownMenuItem(
                     text = { Text(item.name, style = MaterialTheme.typography.bodyMedium) },
@@ -341,7 +332,7 @@ fun DropdownAttending(
                 )
 
             }
-            if (filteredOptions.isNotEmpty()) {
+            if (viewModel.selectedAttending.value.isEmpty()) {
                 IconButton(onClick = { openDialog = true }, Modifier.width(175.dp)) {
                     Row {
                         Icon(
@@ -357,7 +348,6 @@ fun DropdownAttending(
                     }
                 }
             }
-
             if (openDialog)
                 AlertDialog(
                     shape = RoundedCornerShape(25.dp),
@@ -382,9 +372,7 @@ fun DropdownAttending(
                             shape = RoundedCornerShape(25.dp),
                             onClick = {
                                 try {
-                                    coroutineScope.launch {
-                                        viewModel.addAttending(attendingName)
-                                    }
+                                    viewModel.addAttending(attendingName)
                                     openDialog = false
                                 } catch (e: Exception) {
                                     Toast.makeText(
@@ -433,9 +421,6 @@ fun Dropdown(
     var procedureType by remember {
         mutableStateOf("")
     }
-
-    val coroutineScope = rememberCoroutineScope()
-
     val editType = items.find { it.id == addEntry.typeId }
     if (editType?.type?.isNotEmpty() == true) {
         LaunchedEffect(viewModel.selectedProcedure) {
@@ -454,7 +439,21 @@ fun Dropdown(
             value = viewModel.selectedProcedure.value,
             label = { Text(text = label, style = MaterialTheme.typography.bodyMedium) },
             onValueChange = { viewModel.updateSelectedProcedure(it) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (viewModel.selectedProcedure.value.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.updateSelectedProcedure("") }) {
+                            Icon(imageVector = Icons.Outlined.Close, contentDescription = stringResource(
+                                id = R.string.cancel
+                            ))
+                        }
+                    }
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            },
         )
 
         val filteredOptions =
@@ -464,24 +463,6 @@ fun Dropdown(
             expanded = expanded,
             onDismissRequest = { },
         ) {
-            if (filteredOptions.isEmpty()) {
-                IconButton(onClick = { openDialog = true }, Modifier.fillMaxWidth()) {
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Add, contentDescription = stringResource(
-                                id = R.string.add
-                            )
-                        )
-                        Text(
-                            text = stringResource(R.string.add_new_type_confirmation_title),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
             filteredOptions.forEach { item ->
                 DropdownMenuItem(
                     text = { Text(item.type, style = MaterialTheme.typography.bodyMedium) },
@@ -493,7 +474,7 @@ fun Dropdown(
                     },
                 )
             }
-            if (filteredOptions.isNotEmpty()) {
+            if (viewModel.selectedProcedure.value.isEmpty()) {
                 IconButton(onClick = { openDialog = true }, Modifier.width(175.dp)) {
                     Row {
                         Icon(
@@ -533,9 +514,7 @@ fun Dropdown(
                         Button(
                             shape = RoundedCornerShape(25.dp),
                             onClick = {
-                                coroutineScope.launch {
-                                    viewModel.addType(procedureType)
-                                }
+                                viewModel.addType(procedureType)
                                 openDialog = false
                             },
                         ) {

@@ -5,10 +5,10 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vikaspogu.logit.ui.settings.SettingsViewModel
 
 private val lightScheme = lightColorScheme(
@@ -256,7 +256,7 @@ fun LogItTheme(
     content: @Composable () -> Unit
 ) {
     val settingsViewModel: SettingsViewModel = hiltViewModel()
-    val isDark by settingsViewModel.isDark.collectAsState()
+    val isDark by settingsViewModel.isDark.collectAsStateWithLifecycle()
     val colorScheme = if (!isDark) {
         lightScheme
     } else {

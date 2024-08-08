@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class EntriesViewModel @Inject constructor(private val entryRepository: EntryRepository) : ViewModel() {
+class EntriesViewModel @Inject constructor(private val entryRepository: EntryRepository) :
+    ViewModel() {
 
     val entriesUiState: StateFlow<EntriesUiState> = entryRepository.getEntriesWithTypes().map {
         EntriesUiState(it)
@@ -24,9 +26,11 @@ class EntriesViewModel @Inject constructor(private val entryRepository: EntryRep
         initialValue = EntriesUiState()
     )
 
-    suspend fun deleteEntry(entryId: Int) {
-        withContext(Dispatchers.IO) {
-            entryRepository.deleteEntry(entryId)
+    fun deleteEntry(entryId: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                entryRepository.deleteEntry(entryId)
+            }
         }
     }
 

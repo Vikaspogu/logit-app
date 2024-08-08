@@ -88,27 +88,35 @@ class AddEntryViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateEntry() {
-        withContext(Dispatchers.IO) {
-            entryRepository.updateEntry(addEntryUiState.addEntry.toEntry())
+    fun updateEntry() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                entryRepository.updateEntry(addEntryUiState.addEntry.toEntry())
+            }
         }
     }
 
-    suspend fun saveEntry() {
-        withContext(Dispatchers.IO) {
-            entryRepository.insertEntry(addEntryUiState.addEntry.toEntry())
+    fun saveEntry() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                entryRepository.insertEntry(addEntryUiState.addEntry.toEntry())
+            }
         }
     }
 
-    suspend fun addType(procedureType: String) {
-        withContext(Dispatchers.IO) {
-            typeRepository.insertType(Type(0, procedureType))
+    fun addType(procedureType: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                typeRepository.insertType(Type(0, procedureType))
+            }
         }
     }
 
-    suspend fun addAttending(attendingName: String) {
-        withContext(Dispatchers.IO) {
-            attendingRepository.insertAttending(Attending(0, attendingName))
+    fun addAttending(attendingName: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                attendingRepository.insertAttending(Attending(0, attendingName))
+            }
         }
     }
 

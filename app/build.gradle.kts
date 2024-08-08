@@ -91,6 +91,8 @@ dependencies {
 
     //Work manager
     implementation(libs.androidx.work.runtime.ktx)
+
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }
 
 // Allow references to generated code

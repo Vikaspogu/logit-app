@@ -33,11 +33,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,11 +47,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,15 +60,13 @@ fun ManageType(
     modifier: Modifier,
     viewModel: ManageTypeViewModel = hiltViewModel(),
 ) {
-    val typeUiState by viewModel.typeUiState.collectAsState()
+    val typeUiState by viewModel.typeUiState.collectAsStateWithLifecycle()
     var openDialog by remember {
         mutableStateOf(false)
     }
     var procedureType by remember {
         mutableStateOf("")
     }
-    val coroutineScope = rememberCoroutineScope()
-    // Visibility for FAB, could be saved in viewModel
     var isVisible by remember { mutableStateOf(true) }
 
     // Nested scroll for control FAB
@@ -154,9 +150,7 @@ fun ManageType(
                     Button(
                         shape = RoundedCornerShape(25.dp),
                         onClick = {
-                            coroutineScope.launch {
-                                viewModel.addType(procedureType)
-                            }
+                            viewModel.addType(procedureType)
                             openDialog = false
                         },
                     ) {
@@ -223,7 +217,6 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
     var text by remember {
         mutableStateOf(type.type)
     }
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Surface(
         shape = MaterialTheme.shapes.small,
@@ -254,16 +247,14 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                     )
                 }
                 IconButton(onClick = {
-                    coroutineScope.launch {
-                        try {
-                            viewModel.deleteType(type.id)
-                        } catch (e: Exception) {
-                            Toast.makeText(
-                                context,
-                                "Procedure Type cannot be deleted.",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                    try {
+                        viewModel.deleteType(type.id)
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            context,
+                            "Procedure Type cannot be deleted.",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }) {
                     Icon(
@@ -290,9 +281,7 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             IconButton(onClick = {
-                                coroutineScope.launch {
-                                    viewModel.updateType(type.id, text)
-                                }
+                                viewModel.updateType(type.id, text)
                                 editable = !editable
                             }) {
                                 Icon(

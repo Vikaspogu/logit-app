@@ -32,7 +32,7 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
             composable(route = NavigationDestinations.Summary.name) {
                 SummaryScreen(
                     navController = navController,
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
             composable(route = NavigationDestinations.Entries.name) {

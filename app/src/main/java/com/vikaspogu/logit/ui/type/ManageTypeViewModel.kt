@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -23,20 +24,29 @@ class ManageTypeViewModel @Inject constructor(private val typeRepository: TypeRe
             initialValue = TypeUiState()
         )
 
-    suspend fun updateType(id: Int, type: String) {
-        withContext(Dispatchers.IO) {
-            typeRepository.updateType(Type(id, type))
+    fun updateType(id: Int, type: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                typeRepository.updateType(Type(id, type))
+            }
         }
     }
 
-    suspend fun addType(type: String) {
-        withContext(Dispatchers.IO) {
-            typeRepository.insertType(Type(0, type))
+    fun addType(type: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                typeRepository.insertType(Type(0, type))
+            }
         }
     }
 
-    suspend fun deleteType(id: Int) {
-        typeRepository.deleteType(id)
+    fun deleteType(id: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                typeRepository.deleteType(id)
+            }
+        }
+
     }
 
     companion object {

@@ -41,11 +41,9 @@ import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +56,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.vikaspogu.logit.BuildConfig
@@ -67,8 +66,6 @@ import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
 import com.vikaspogu.logit.ui.util.Constants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 
@@ -105,7 +102,7 @@ fun SettingColumn(
     viewModel: SettingsViewModel
 ) {
     val context = LocalContext.current
-    val entriesList by viewModel.entriesUiState.collectAsState()
+    val entriesList by viewModel.entriesUiState.collectAsStateWithLifecycle()
     val chooseDirectoryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
@@ -113,8 +110,7 @@ fun SettingColumn(
             exportCSV(it, context, entriesList.entries)
         }
     }
-    val selectedDays by viewModel.reminderDays.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
+    val selectedDays by viewModel.reminderDays.collectAsStateWithLifecycle()
     var openDialog by remember {
         mutableStateOf(false)
     }
@@ -170,7 +166,6 @@ fun SettingColumn(
                         days = selectedDays.reminderDaysSet,
                         onConfirmation = { openDialog = false },
                         viewModel = viewModel,
-                        coroutineScope = coroutineScope
                     )
                 }
             }
@@ -181,7 +176,7 @@ fun SettingColumn(
             ) {
                 SegmentedButton(selected = !viewModel.selectedTheme.value, onClick = {
                     viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
-                    coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
+                    viewModel.saveThemePreferences(viewModel.selectedTheme.value)
                 }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
                     Text(
                         text = stringResource(id = R.string.light_theme),
@@ -190,7 +185,7 @@ fun SettingColumn(
                 })
                 SegmentedButton(selected = viewModel.selectedTheme.value, onClick = {
                     viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
-                    coroutineScope.launch { viewModel.saveThemePreferences(viewModel.selectedTheme.value) }
+                    viewModel.saveThemePreferences(viewModel.selectedTheme.value)
                 }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
                     Text(
                         text = stringResource(id = R.string.dark_theme),
@@ -264,8 +259,7 @@ fun DialogWithReminders(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     days: Set<String>,
-    viewModel: SettingsViewModel,
-    coroutineScope: CoroutineScope
+    viewModel: SettingsViewModel
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
 
@@ -315,12 +309,9 @@ fun DialogWithReminders(
                                 } else {
                                     newDays.remove(day)
                                 }
-                                coroutineScope.launch {
-                                    viewModel.saveReminderDaysPreferences(
-                                        newDays
-                                    )
-                                }
-
+                                viewModel.saveReminderDaysPreferences(
+                                    newDays
+                                )
                             }
                         )
                         Text(text = day)
@@ -350,18 +341,16 @@ fun DialogWithReminders(
                         shape = RoundedCornerShape(25.dp),
                         onClick = {
                             onConfirmation()
-                            coroutineScope.launch {
-                                viewModel.updateSelectedTime(getTimeInMillis(timePickerState))
-                                viewModel.saveReminderTimePreferences(
-                                    getTimeInMillis(
-                                        timePickerState
-                                    )
+                            viewModel.updateSelectedTime(getTimeInMillis(timePickerState))
+                            viewModel.saveReminderTimePreferences(
+                                getTimeInMillis(
+                                    timePickerState
                                 )
-                                viewModel.saveScheduleReminder(
-                                    newDays,
-                                    getTimeInMillis(timePickerState)
-                                )
-                            }
+                            )
+                            viewModel.saveScheduleReminder(
+                                newDays,
+                                getTimeInMillis(timePickerState)
+                            )
                         },
                     ) {
                         Text(
