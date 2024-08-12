@@ -202,6 +202,16 @@ fun DialogManagePersons(
                 ) {
                     Button(
                         shape = RoundedCornerShape(25.dp),
+                        onClick = { onDismissRequest() },
+                    ) {
+                        Text(
+                            stringResource(R.string.cancel),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
                         onClick = {
                             onConfirmation()
                             if (actionType == Constants.ADD) {
@@ -218,16 +228,6 @@ fun DialogManagePersons(
                             } else {
                                 stringResource(R.string.update)
                             },
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Button(
-                        shape = RoundedCornerShape(25.dp),
-                        onClick = { onDismissRequest() },
-                    ) {
-                        Text(
-                            stringResource(R.string.cancel),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
