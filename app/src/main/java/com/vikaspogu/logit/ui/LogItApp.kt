@@ -14,11 +14,12 @@ import com.vikaspogu.logit.ui.entry.AddEditEntry
 import com.vikaspogu.logit.ui.entry.EntriesScreen
 import com.vikaspogu.logit.ui.home.SummaryDetailsScreen
 import com.vikaspogu.logit.ui.home.SummaryScreen
+import com.vikaspogu.logit.ui.manage.ManagePersons
+import com.vikaspogu.logit.ui.manage.ManageType
 import com.vikaspogu.logit.ui.settings.Settings
-import com.vikaspogu.logit.ui.type.ManageType
 
 enum class NavigationDestinations {
-    Summary, Entries, Settings, Types
+    Summary, Entries, Settings, Types, Persons
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -73,6 +74,30 @@ fun LogItApp(navController: NavHostController = rememberNavController(), modifie
                 }
             }) {
                 ManageType(
+                    navController = navController,
+                    modifier
+                )
+            }
+            composable(route = NavigationDestinations.Persons.name, enterTransition = {
+                when (initialState.destination.route) {
+                    NavigationDestinations.Settings.name -> slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(700)
+                    )
+
+                    else -> null
+                }
+            }, exitTransition = {
+                when (targetState.destination.route) {
+                    NavigationDestinations.Settings.name -> slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(700)
+                    )
+
+                    else -> null
+                }
+            }) {
+                ManagePersons(
                     navController = navController,
                     modifier
                 )

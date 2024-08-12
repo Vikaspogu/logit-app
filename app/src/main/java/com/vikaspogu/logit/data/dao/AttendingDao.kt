@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AttendingDao {
-    @Query("SELECT * FROM attending")
+    @Query("SELECT * FROM attending ORDER BY attending.name ASC")
     fun getAllAttending(): Flow<List<Attending>>
 
     @Query("SELECT * from attending WHERE id = :id")

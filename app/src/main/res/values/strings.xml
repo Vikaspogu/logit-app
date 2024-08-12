@@ -21,6 +21,7 @@
     <string name="project_on_github">https://github.com/Vikaspogu/logit-app.git</string>
     <string name="edit">Edit</string>
     <string name="manage_types">Manage Types</string>
+    <string name="manage_names">Manage Names</string>
     <string name="export_csv">Export data to CSV</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="light_theme">Light Theme</string>

@@ -138,8 +138,13 @@ fun SettingColumn(
                 onClick = {
                     navController.navigate(NavigationDestinations.Types.name)
                 })
+            SettingsBasicLinkItem(title = R.string.manage_names,
+                icon = R.drawable.ic_accounts,
+                onClick = {
+                    navController.navigate(NavigationDestinations.Persons.name)
+                })
             SettingsBasicLinkItem(title = R.string.export_csv,
-                icon = R.drawable.ic_export,
+                icon = R.drawable.ic_export_notes,
                 onClick = {
                     chooseDirectoryLauncher.launch(null)
                 })

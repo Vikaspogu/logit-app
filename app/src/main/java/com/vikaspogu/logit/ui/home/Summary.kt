@@ -53,7 +53,9 @@ import com.vikaspogu.logit.ui.util.Constants
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryScreen(
-    navController: NavHostController, modifier: Modifier, viewModel: SummaryViewModel = hiltViewModel()
+    navController: NavHostController,
+    modifier: Modifier,
+    viewModel: SummaryViewModel = hiltViewModel()
 ) {
     val summaryUiState by viewModel.summaryUiState.collectAsStateWithLifecycle()
     Scaffold(topBar = {
@@ -69,7 +71,7 @@ fun SummaryScreen(
                     oldValue = "{action}", newValue = Constants.ADD
                 )
             )
-        }, containerColor = MaterialTheme.colorScheme.primaryContainer) {
+        }, containerColor = MaterialTheme.colorScheme.inverseSurface) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(id = R.string.add),
@@ -150,10 +152,20 @@ fun SummaryDetails(
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
         Text(
             modifier = Modifier
-                .padding(16.dp),
+                .padding(start = 20.dp, top = 10.dp),
             text = stringResource(id = R.string.summary),
             style = MaterialTheme.typography.headlineLarge
         )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = buildString {
+                append("Total no. of procedures | ")
+                append(summaryList.sumOf { it.total })
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            style = MaterialTheme.typography.titleLarge,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         SingleChoiceSegmentedButtonRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -201,7 +213,7 @@ fun SummaryDetails(
         }
     }
     if (!showPieView) {
-        for (summary in summaryList) {
+        for (summary in summaryList.sortedBy { it.type }) {
             SummaryCard(
                 summary, modifier, navController
             )
@@ -210,7 +222,7 @@ fun SummaryDetails(
         Spacer(Modifier.height(16.dp))
     }
     AnimatedVisibility(visible = showPieView) {
-        EntriesCircularBar(summaryList)
+        EntriesCircularBar(summaryList.sortedByDescending { it.total })
     }
 
 }

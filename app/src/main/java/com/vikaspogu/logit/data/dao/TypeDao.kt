@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TypeDao {
 
-    @Query("SELECT * FROM types")
+    @Query("SELECT * FROM types ORDER BY types.type ASC")
     fun getAllTypes(): Flow<List<Type>>
 
     @Query("SELECT * from types WHERE id = :id")

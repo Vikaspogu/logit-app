@@ -13,6 +13,7 @@ import com.vikaspogu.logit.data.LogItDatabase
 import com.vikaspogu.logit.data.dao.AttendingDao
 import com.vikaspogu.logit.data.dao.EntryDao
 import com.vikaspogu.logit.data.dao.TypeDao
+import com.vikaspogu.logit.data.migrations.MIGRATION_3_4
 import com.vikaspogu.logit.data.repository.AttendingRepository
 import com.vikaspogu.logit.data.repository.EntryRepository
 import com.vikaspogu.logit.data.repository.OfflineAttendingRepository
@@ -40,6 +41,7 @@ object AppModule {
     fun provideLogItDatabase(@ApplicationContext context: Context) =
         Room.databaseBuilder(context, LogItDatabase::class.java, LogItDatabase.DATABASE_NAME)
             .createFromAsset("database/logit_database.db")
+            .addMigrations(MIGRATION_3_4)
             .build()
 
     @Singleton

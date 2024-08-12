@@ -1,9 +1,9 @@
-package com.vikaspogu.logit.ui.type
+package com.vikaspogu.logit.ui.manage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vikaspogu.logit.data.model.Type
-import com.vikaspogu.logit.data.repository.TypeRepository
+import com.vikaspogu.logit.data.model.Attending
+import com.vikaspogu.logit.data.repository.AttendingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,35 +15,35 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class ManageTypeViewModel @Inject constructor(private val typeRepository: TypeRepository) :
+class ManagePersonsViewModel @Inject constructor(private val attendingRepository: AttendingRepository) :
     ViewModel() {
-    val typeUiState: StateFlow<TypeUiState> =
-        typeRepository.getAllTypes().map { TypeUiState(it) }.stateIn(
+    val personUiState: StateFlow<PersonsUiState> =
+        attendingRepository.getAllAttending().map { PersonsUiState(it) }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = TypeUiState()
+            initialValue = PersonsUiState()
         )
 
-    fun updateType(id: Int, type: String) {
+    fun updatePersons(id: Int, type: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                typeRepository.updateType(Type(id, type))
+                attendingRepository.updateAttending(Attending(id, type))
             }
         }
     }
 
-    fun addType(type: String) {
+    fun addPersons(type: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                typeRepository.insertType(Type(0, type))
+                attendingRepository.insertAttending(Attending(0, type))
             }
         }
     }
 
-    fun deleteType(id: Int) {
+    fun deletePersons(id: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                typeRepository.deleteType(id)
+                attendingRepository.deleteAttending(id)
             }
         }
 
@@ -54,4 +54,4 @@ class ManageTypeViewModel @Inject constructor(private val typeRepository: TypeRe
     }
 }
 
-data class TypeUiState(val typeList: List<Type> = listOf())
+data class PersonsUiState(val personList: List<Attending> = listOf())

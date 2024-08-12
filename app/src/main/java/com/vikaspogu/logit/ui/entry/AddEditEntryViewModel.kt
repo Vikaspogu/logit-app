@@ -107,7 +107,7 @@ class AddEntryViewModel @Inject constructor(
     fun addType(procedureType: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                typeRepository.insertType(Type(0, procedureType))
+                typeRepository.insertType(Type(0, procedureType.trim()))
             }
         }
     }
@@ -115,7 +115,7 @@ class AddEntryViewModel @Inject constructor(
     fun addAttending(attendingName: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                attendingRepository.insertAttending(Attending(0, attendingName))
+                attendingRepository.insertAttending(Attending(0, attendingName.trim()))
             }
         }
     }
