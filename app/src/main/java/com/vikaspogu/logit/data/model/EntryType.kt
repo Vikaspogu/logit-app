@@ -15,5 +15,10 @@ data class EntryType(
     @ColumnInfo(name = "type_id")
     val typeId: Int,
     val type: String,
-    val gender: String
+    val gender: String,
+    val asa: Int,
+    val clinical: String,
+    val cvc: String,
+    @ColumnInfo(name = "regional_type")
+    val regionalType: String?,
 )

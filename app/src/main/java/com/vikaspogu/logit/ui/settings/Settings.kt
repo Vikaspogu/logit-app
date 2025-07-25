@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -65,6 +67,7 @@ import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.theme.HeadingStyle
 import com.vikaspogu.logit.ui.util.Constants
 import java.util.Locale
 
@@ -130,19 +133,69 @@ fun SettingColumn(
         item {
             Text(
                 modifier = Modifier.padding(16.dp),
+                text = stringResource(id = R.string.iam),
+                style = HeadingStyle
+            )
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, end = 10.dp, top = 5.dp),
+            ) {
+                SegmentedButton(selected = !viewModel.residentView.value, onClick = {
+                    viewModel.updateSelectedView(!viewModel.residentView.value)
+                    viewModel.saveViewPreferences(viewModel.residentView.value)
+                }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
+                    Row (verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = stringResource(id = R.string.attending)
+                        )
+                        Text(
+                            text = stringResource(id = R.string.attendant),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .padding(5.dp, 0.dp, 0.dp, 0.dp)
+                        )
+                    }
+                })
+                SegmentedButton(selected = viewModel.residentView.value, onClick = {
+                    viewModel.updateSelectedView(!viewModel.residentView.value)
+                    viewModel.saveViewPreferences(viewModel.residentView.value)
+                }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
+                    Row (verticalAlignment = Alignment.CenterVertically){
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = stringResource(id = R.string.attending)
+                        )
+                        Text(
+                            text = stringResource(id = R.string.resident),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .padding(5.dp, 0.dp, 0.dp, 0.dp)
+                        )
+                    }
+                })
+            }
+        }
+        item {
+            Text(
+                modifier = Modifier.padding(16.dp),
                 text = stringResource(id = R.string.settings),
-                style = MaterialTheme.typography.titleLarge
+                style = HeadingStyle
             )
             SettingsBasicLinkItem(title = R.string.manage_types,
                 icon = R.drawable.ic_code,
                 onClick = {
                     navController.navigate(NavigationDestinations.Types.name)
                 })
-            SettingsBasicLinkItem(title = R.string.manage_names,
-                icon = R.drawable.ic_accounts,
-                onClick = {
-                    navController.navigate(NavigationDestinations.Persons.name)
-                })
+            if (viewModel.residentView.value){
+                SettingsBasicLinkItem(title = R.string.manage_names,
+                    icon = R.drawable.ic_accounts,
+                    onClick = {
+                        navController.navigate(NavigationDestinations.Persons.name)
+                    })
+            }
+
             SettingsBasicLinkItem(title = R.string.export_csv,
                 icon = R.drawable.ic_export_notes,
                 onClick = {
@@ -203,7 +256,7 @@ fun SettingColumn(
             Text(
                 modifier = Modifier.padding(16.dp),
                 text = stringResource(id = R.string.about),
-                style = MaterialTheme.typography.titleLarge
+                style = HeadingStyle
             )
             SettingsBasicLinkItem(
                 title = R.string.project_on_github,

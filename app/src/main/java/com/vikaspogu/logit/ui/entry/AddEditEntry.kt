@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DateRange
@@ -30,10 +32,11 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -56,9 +59,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Attending
+import com.vikaspogu.logit.data.model.RegionalType
 import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
 import com.vikaspogu.logit.ui.util.Constants
 import java.util.Locale
 
@@ -103,42 +108,206 @@ fun AddEditForm(
 ) {
     val typesUiState by viewModel.typeUiState.collectAsStateWithLifecycle()
     val attendingUiState by viewModel.attendingUiState.collectAsStateWithLifecycle()
+    val regionalUiState by viewModel.regionalTypeUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     if (addEntry.gender.isEmpty()) {
         addEntry.gender = "Male"
     }
     val radioOptions = listOf("Male", "Female")
-    val isButtonEnabled =
-        addEntry.age.isNotEmpty() && addEntry.quantity.isNotEmpty() && addEntry.gender.isNotEmpty() && viewModel.selectedAttending.value.isNotEmpty() && viewModel.selectedProcedure.value.isNotEmpty()
+    val isButtonEnabled = if (viewModel.residentView.value) {
+        addEntry.age.isNotEmpty()
+                && addEntry.quantity.isNotEmpty()
+                && addEntry.gender.isNotEmpty()
+                && viewModel.selectedAttending.value.isNotEmpty()
+                && viewModel.selectedProcedure.value.isNotEmpty()
+    } else {
+        addEntry.asa.isNotEmpty()
+                && addEntry.gender.isNotEmpty()
+                && viewModel.selectedProcedure.value.isNotEmpty()
+    }
+    if (addEntry.clinical == "Yes"){
+        LaunchedEffect(viewModel.selectedClinical) {
+            viewModel.updateSelectedClinical(true)
+        }
+    }
+    if (addEntry.cvc == "Yes"){
+        LaunchedEffect(viewModel.selectedCVC) {
+            viewModel.updateSelectedCVC(true)
+        }
+    }
+    if (addEntry.regionalId != null){
+        LaunchedEffect(viewModel.selectedRegional) {
+            viewModel.updateSelectedRegional(true)
+        }
+    }
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
         modifier = modifier.padding(10.dp)
     ) {
-        DropdownAttending(
-            items = attendingUiState.attending,
-            label = stringResource(R.string.attending),
-            addEntry,
-            viewModel
-        )
-        OutlinedTextField(
-            value = addEntry.age,
-            onValueChange = { onValueChange(addEntry.copy(age = it)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = true,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = {
+        if (viewModel.residentView.value) {
+            DropdownAttending(
+                items = attendingUiState.attending,
+                label = stringResource(R.string.attending),
+                addEntry,
+                viewModel
+            )
+            OutlinedTextField(
+                value = addEntry.age,
+                onValueChange = { onValueChange(addEntry.copy(age = it)) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = true,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = {
+                    Text(
+                        text = stringResource(R.string.age),
+                        style = SmallHeadingStyle
+                    )
+                },
+            )
+            OutlinedTextField(
+                value = addEntry.quantity,
+                onValueChange = { onValueChange(addEntry.copy(quantity = it)) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = true,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = {
+                    Text(
+                        text = stringResource(R.string.quantity),
+                        style = SmallHeadingStyle
+                    )
+                }
+            )
+        } else {
+            OutlinedTextField(
+                value = addEntry.asa,
+                onValueChange = { onValueChange(addEntry.copy(asa = it)) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = true,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = {
+                    Text(
+                        text = stringResource(R.string.asa),
+                        style = SmallHeadingStyle
+                    )
+                },
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
                 Text(
-                    text = stringResource(R.string.age),
-                    style = MaterialTheme.typography.bodyMedium
+                    text = stringResource(R.string.clinical),
+                    style = SmallHeadingStyle,
+                    modifier = Modifier.padding(start = 10.dp)
                 )
-            },
-        )
+                Spacer(modifier = Modifier.padding(end = 20.dp))
+                Switch(
+                    checked = viewModel.selectedClinical.value,
+                    onCheckedChange = {
+                        if (it) {
+                            addEntry.clinical = "Yes"
+                        } else {
+                            addEntry.clinical = "No"
+                        }
+                        viewModel.updateSelectedClinical(it)
+                    },
+                    thumbContent = if (viewModel.selectedClinical.value) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
+                    } else {
+                        null
+                    }
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                Text(
+                    text = stringResource(R.string.cvc),
+                    style = SmallHeadingStyle,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+                Spacer(modifier = Modifier.padding(end = 20.dp))
+                Switch(
+                    checked = viewModel.selectedCVC.value,
+                    onCheckedChange = {
+                        if (it){
+                            addEntry.cvc = "Yes"
+                        } else {
+                            addEntry.cvc = "No"
+                        }
+                        viewModel.updateSelectedCVC(it)
+                    },
+                    thumbContent = if (viewModel.selectedCVC.value) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
+                    } else {
+                        null
+                    }
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                Text(
+                    text = stringResource(R.string.regional),
+                    style = SmallHeadingStyle,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+                Spacer(modifier = Modifier.padding(end = 20.dp))
+                Switch(
+                    checked = viewModel.selectedRegional.value,
+                    onCheckedChange = {
+                        viewModel.updateSelectedRegional(it)
+                    },
+                    thumbContent = if (viewModel.selectedRegional.value) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
+                    } else {
+                        null
+                    }
+                )
+            }
+            if (viewModel.selectedRegional.value){
+                DropdownRegional(
+                    items = regionalUiState.types,
+                    label = stringResource(R.string.regional_type),
+                    addEntry,
+                    viewModel
+                )
+            }
+        }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
+            Text(
+                text = stringResource(R.string.gender),
+                style = SmallHeadingStyle,
+                modifier = Modifier.padding(start = 10.dp)
+            )
             radioOptions.forEach { text ->
                 Row(
                     Modifier
@@ -160,26 +329,13 @@ fun AddEditForm(
                     )
                     Text(
                         text = text,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = SmallHeadingStyle,
                         modifier = Modifier.padding(start = 16.dp)
                     )
                 }
             }
         }
-        OutlinedTextField(
-            value = addEntry.quantity,
-            onValueChange = { onValueChange(addEntry.copy(quantity = it)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = true,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = {
-                Text(
-                    text = stringResource(R.string.quantity),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        )
+
         OutlinedTextField(
             value = addEntry.notes,
             onValueChange = { onValueChange(addEntry.copy(notes = it)) },
@@ -188,7 +344,7 @@ fun AddEditForm(
             label = {
                 Text(
                     text = stringResource(R.string.notes),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = SmallHeadingStyle
                 )
             }
         )
@@ -204,7 +360,7 @@ fun AddEditForm(
                 label = {
                     Text(
                         text = stringResource(R.string.date),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = SmallHeadingStyle
                     )
                 },
                 trailingIcon = {
@@ -267,6 +423,151 @@ fun AddEditForm(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun DropdownRegional(
+    items: List<RegionalType>,
+    label: String,
+    addEntry: AddEntry,
+    viewModel: AddEntryViewModel
+) {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+    var openDialog by rememberSaveable { mutableStateOf(false) }
+    var regionalType by remember {
+        mutableStateOf("")
+    }
+    val editType = items.find { it.id == addEntry.regionalId }
+    if (editType?.name?.isNotEmpty() == true) {
+        LaunchedEffect(viewModel.selectedRegionalType) {
+            viewModel.updateSelectedRegionalType(editType.name)
+        }
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        TextField(
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            value = viewModel.selectedRegionalType.value,
+            label = { Text(text = label, style = SmallHeadingStyle) },
+            onValueChange = { viewModel.updateSelectedRegionalType(it) },
+            trailingIcon = {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (viewModel.selectedRegionalType.value.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.updateSelectedRegionalType("") }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Close,
+                                contentDescription = stringResource(
+                                    id = R.string.cancel
+                                )
+                            )
+                        }
+                    }
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            },
+        )
+
+        val filteredOptions =
+            items.filter { it.name.contains(viewModel.selectedRegionalType.value, ignoreCase = true) }
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { },
+        ) {
+            filteredOptions.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item.name, style = SmallHeadingStyle) },
+                    onClick = {
+                        addEntry.regionalId = item.id
+                        viewModel.updateSelectedRegionalType(item.name)
+                        expanded = false
+                        Toast.makeText(context, item.name, Toast.LENGTH_SHORT).show()
+                    },
+                )
+
+            }
+            if (viewModel.selectedRegionalType.value.isEmpty()) {
+                IconButton(onClick = { openDialog = true }, Modifier.width(175.dp)) {
+                    Row {
+                        Icon(
+                            imageVector = Icons.Outlined.Add, contentDescription = stringResource(
+                                id = R.string.add
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = stringResource(R.string.add_new_type_confirmation_title),
+                            style = SmallHeadingStyle
+                        )
+                    }
+                }
+            }
+            if (openDialog)
+                AlertDialog(
+                    shape = RoundedCornerShape(25.dp),
+                    onDismissRequest = { openDialog = false },
+                    title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
+                    text = {
+                        OutlinedTextField(
+                            value = regionalType,
+                            onValueChange = { regionalType = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = true,
+                            label = {
+                                Text(
+                                    text = stringResource(id = R.string.regional_type),
+                                    style = SmallHeadingStyle
+                                )
+                            }
+                        )
+                    },
+                    confirmButton = {
+                        Button(
+                            shape = RoundedCornerShape(25.dp),
+                            onClick = {
+                                try {
+                                    viewModel.addRegionalType(regionalType)
+                                    openDialog = false
+                                } catch (e: Exception) {
+                                    Toast.makeText(
+                                        context,
+                                        "Something went wrong.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            },
+                        ) {
+                            Text(
+                                stringResource(R.string.save),
+                                style = SmallHeadingStyle
+                            )
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            shape = RoundedCornerShape(25.dp),
+                            onClick = {
+                                openDialog = false
+                            }) {
+                            Text(
+                                stringResource(R.string.cancel),
+                                style = SmallHeadingStyle
+                            )
+                        }
+                    }
+                )
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun DropdownAttending(
     items: List<Attending>,
     label: String,
@@ -295,7 +596,7 @@ fun DropdownAttending(
                 .menuAnchor()
                 .fillMaxWidth(),
             value = viewModel.selectedAttending.value,
-            label = { Text(text = label, style = MaterialTheme.typography.bodyMedium) },
+            label = { Text(text = label, style = SmallHeadingStyle) },
             onValueChange = { viewModel.updateSelectedAttending(it) },
             trailingIcon = {
                 Row(
@@ -304,9 +605,12 @@ fun DropdownAttending(
                 ) {
                     if (viewModel.selectedAttending.value.isNotEmpty()) {
                         IconButton(onClick = { viewModel.updateSelectedAttending("") }) {
-                            Icon(imageVector = Icons.Outlined.Close, contentDescription = stringResource(
-                                id = R.string.cancel
-                            ))
+                            Icon(
+                                imageVector = Icons.Outlined.Close,
+                                contentDescription = stringResource(
+                                    id = R.string.cancel
+                                )
+                            )
                         }
                     }
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -322,7 +626,7 @@ fun DropdownAttending(
         ) {
             filteredOptions.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(item.name, style = MaterialTheme.typography.bodyMedium) },
+                    text = { Text(item.name, style = SmallHeadingStyle) },
                     onClick = {
                         addEntry.attendingId = item.id
                         viewModel.updateSelectedAttending(item.name)
@@ -343,7 +647,7 @@ fun DropdownAttending(
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = stringResource(R.string.add_attending_confirmation_title),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = SmallHeadingStyle
                         )
                     }
                 }
@@ -362,7 +666,7 @@ fun DropdownAttending(
                             label = {
                                 Text(
                                     text = stringResource(id = R.string.attending),
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = SmallHeadingStyle
                                 )
                             }
                         )
@@ -385,7 +689,7 @@ fun DropdownAttending(
                         ) {
                             Text(
                                 stringResource(R.string.save),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = SmallHeadingStyle
                             )
                         }
                     },
@@ -397,7 +701,7 @@ fun DropdownAttending(
                             }) {
                             Text(
                                 stringResource(R.string.cancel),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = SmallHeadingStyle
                             )
                         }
                     }
@@ -437,7 +741,7 @@ fun Dropdown(
                 .menuAnchor()
                 .fillMaxWidth(),
             value = viewModel.selectedProcedure.value,
-            label = { Text(text = label, style = MaterialTheme.typography.bodyMedium) },
+            label = { Text(text = label, style = SmallHeadingStyle) },
             onValueChange = { viewModel.updateSelectedProcedure(it) },
             trailingIcon = {
                 Row(
@@ -446,9 +750,12 @@ fun Dropdown(
                 ) {
                     if (viewModel.selectedProcedure.value.isNotEmpty()) {
                         IconButton(onClick = { viewModel.updateSelectedProcedure("") }) {
-                            Icon(imageVector = Icons.Outlined.Close, contentDescription = stringResource(
-                                id = R.string.cancel
-                            ))
+                            Icon(
+                                imageVector = Icons.Outlined.Close,
+                                contentDescription = stringResource(
+                                    id = R.string.cancel
+                                )
+                            )
                         }
                     }
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -465,7 +772,7 @@ fun Dropdown(
         ) {
             filteredOptions.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(item.type, style = MaterialTheme.typography.bodyMedium) },
+                    text = { Text(item.type, style = SmallHeadingStyle) },
                     onClick = {
                         addEntry.typeId = item.id
                         viewModel.updateSelectedProcedure(item.type)
@@ -486,7 +793,7 @@ fun Dropdown(
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = stringResource(R.string.add_new_type_confirmation_title),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = SmallHeadingStyle
                         )
                     }
                 }
@@ -505,7 +812,7 @@ fun Dropdown(
                             label = {
                                 Text(
                                     text = stringResource(id = R.string.procedure_type),
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = SmallHeadingStyle
                                 )
                             }
                         )
@@ -520,7 +827,7 @@ fun Dropdown(
                         ) {
                             Text(
                                 stringResource(R.string.save),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = SmallHeadingStyle
                             )
                         }
                     },
@@ -532,7 +839,7 @@ fun Dropdown(
                             }) {
                             Text(
                                 stringResource(R.string.cancel),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = SmallHeadingStyle
                             )
                         }
                     }

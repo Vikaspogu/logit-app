@@ -13,4 +13,6 @@ class OfflineAttendingRepository @Inject constructor(private val attendingDao: A
     override suspend fun updateAttending(attending: Attending) = attendingDao.update(attending)
 
     override suspend fun deleteAttending(id: Int) = attendingDao.delete(id)
+
+    override suspend fun getAttendingIdByName(name: String): Flow<Int>  = attendingDao.getAttendingIdByName(name)
 }

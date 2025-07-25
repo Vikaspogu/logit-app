@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.1"
+agp = "8.11.1"
 datastorePreferences = "1.1.1"
 hiltAndroid = "2.49"
 hiltNavigationCompose = "1.2.0"
@@ -17,6 +17,7 @@ navigationCompose = "2.7.7"
 documentfile = "1.0.1"
 roomKtx = "2.6.1"
 workRuntimeKtx = "2.9.0"
+uiTextGoogleFonts = "1.8.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,7 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
 kotlin-csv-jvm = { module = "com.github.doyaaaaaken:kotlin-csv-jvm", version.ref = "kotlinCsvJvm" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

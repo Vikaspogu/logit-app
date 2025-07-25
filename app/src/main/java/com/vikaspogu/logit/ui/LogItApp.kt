@@ -17,19 +17,26 @@ import com.vikaspogu.logit.ui.home.SummaryScreen
 import com.vikaspogu.logit.ui.manage.ManagePersons
 import com.vikaspogu.logit.ui.manage.ManageType
 import com.vikaspogu.logit.ui.settings.Settings
+import com.vikaspogu.logit.ui.startup.StartupScreen
 
 enum class NavigationDestinations {
-    Summary, Entries, Settings, Types, Persons
+    Summary, Entries, Settings, Types, Persons, Startup
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LogItApp(navController: NavHostController = rememberNavController(), modifier: Modifier) {
+fun LogItApp(navController: NavHostController = rememberNavController(), modifier: Modifier, username: String) {
     Scaffold {
         NavHost(
             navController = navController,
-            startDestination = NavigationDestinations.Summary.name,
+            startDestination = if (username.isNullOrBlank()) NavigationDestinations.Startup.name else NavigationDestinations.Summary.name,
         ) {
+            composable(route = NavigationDestinations.Startup.name) {
+                StartupScreen(
+                    navController = navController,
+                    modifier = modifier,
+                )
+            }
             composable(route = NavigationDestinations.Summary.name) {
                 SummaryScreen(
                     navController = navController,

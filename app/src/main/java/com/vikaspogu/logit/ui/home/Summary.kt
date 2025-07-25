@@ -47,6 +47,9 @@ import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.PieChart
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.theme.HeadingStyle
+import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
+import com.vikaspogu.logit.ui.theme.TitleStyle
 import com.vikaspogu.logit.ui.util.Constants
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -85,10 +88,11 @@ fun SummaryScreen(
                 summaryList = summaryUiState.summaryList,
                 contentPadding = innerPadding,
                 modifier = modifier.fillMaxSize(),
-                navController
+                navController,
+                viewModel
             )
         } else {
-            EmptySummary(modifier = modifier)
+            EmptySummary(modifier = modifier, viewModel)
         }
 
     }
@@ -99,13 +103,19 @@ fun SummaryList(
     summaryList: List<Summary>,
     contentPadding: PaddingValues,
     modifier: Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: SummaryViewModel
 ) {
     LazyColumn(
         modifier = modifier, contentPadding = contentPadding
     ) {
         item {
-            SummaryDetails(summaryList, modifier, navController)
+            SummaryDetails(
+                summaryList,
+                modifier,
+                navController,
+                viewModel
+            )
         }
     }
 }
@@ -122,20 +132,30 @@ fun EntriesCircularBar(summaryList: List<Summary>) {
 }
 
 @Composable
-fun EmptySummary(modifier: Modifier) {
+fun EmptySummary(modifier: Modifier, viewModel: SummaryViewModel) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
+            modifier = Modifier
+                .padding(start = 20.dp, top = 20.dp),
+            text = buildString {
+                append("Welcome, ")
+                append(viewModel.username.value)
+            },
+            style = TitleStyle
+        )
+        Spacer(modifier = Modifier.padding(top = 25.dp, bottom = 25.dp))
+        Text(
             text = "You don't have any summaries",
-            style = MaterialTheme.typography.headlineSmall,
+            style = HeadingStyle,
             color = MaterialTheme.colorScheme.inverseSurface,
         )
         Text(
             text = "Click the + button to add",
-            style = MaterialTheme.typography.headlineSmall,
+            style = HeadingStyle,
             color = MaterialTheme.colorScheme.inverseSurface,
         )
     }
@@ -144,17 +164,24 @@ fun EmptySummary(modifier: Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryDetails(
-    summaryList: List<Summary>, modifier: Modifier, navController: NavHostController
+    summaryList: List<Summary>,
+    modifier: Modifier,
+    navController: NavHostController,
+    viewModel: SummaryViewModel
 ) {
     var showPieView by remember {
         mutableStateOf(false)
     }
+
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
         Text(
             modifier = Modifier
-                .padding(start = 20.dp, top = 10.dp),
-            text = stringResource(id = R.string.summary),
-            style = MaterialTheme.typography.headlineLarge
+                .padding(start = 20.dp, top = 20.dp),
+            text = buildString {
+                append("Welcome, ")
+                append(viewModel.username.value)
+            },
+            style = TitleStyle
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
@@ -163,7 +190,7 @@ fun SummaryDetails(
                 append(summaryList.sumOf { it.total })
             },
             modifier = Modifier.padding(start = 20.dp),
-            style = MaterialTheme.typography.titleLarge,
+            style = HeadingStyle,
         )
         Spacer(modifier = Modifier.height(10.dp))
         SingleChoiceSegmentedButtonRow(
@@ -185,7 +212,7 @@ fun SummaryDetails(
                     )
                     Text(
                         text = stringResource(id = R.string.linear_layout),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = SmallHeadingStyle,
                         modifier = Modifier.padding(start = 2.dp)
                     )
 
@@ -205,7 +232,7 @@ fun SummaryDetails(
                     )
                     Text(
                         text = stringResource(id = R.string.pie_layout),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = SmallHeadingStyle,
                         modifier = Modifier.padding(start = 2.dp)
                     )
                 }
@@ -229,7 +256,8 @@ fun SummaryDetails(
 
 @Composable
 fun SummaryCard(summary: Summary, modifier: Modifier, navController: NavHostController) {
-    Surface(shape = MaterialTheme.shapes.small,
+    Surface(
+        shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.primaryContainer,
         shadowElevation = 5.dp,
         modifier = modifier
@@ -250,19 +278,20 @@ fun SummaryCard(summary: Summary, modifier: Modifier, navController: NavHostCont
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_patient_list),
+                painter = painterResource(R.drawable.clinical_notes_20px),
                 contentDescription = stringResource(R.string.patient_list),
                 tint = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = summary.type,
-                style = MaterialTheme.typography.titleLarge,
+                style = HeadingStyle,
                 modifier = modifier.weight(1f),
                 color = MaterialTheme.colorScheme.inverseSurface,
             )
             Text(
-                text = summary.total.toString(), style = MaterialTheme.typography.titleLarge,
+                text = summary.total.toString(),
+                style = HeadingStyle,
                 color = MaterialTheme.colorScheme.inverseSurface,
             )
         }

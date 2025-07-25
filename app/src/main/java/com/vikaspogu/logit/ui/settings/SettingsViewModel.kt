@@ -40,6 +40,12 @@ class SettingsViewModel @Inject constructor(
         _selectedTheme.value = theme
     }
 
+    private val _residentView = mutableStateOf(false)
+    var residentView: MutableState<Boolean> = _residentView
+    fun updateSelectedView(view: Boolean) {
+        _residentView.value = view
+    }
+
     private val _selectedTime = mutableLongStateOf(0L)
     var selectedTime: MutableState<Long> = _selectedTime
     fun updateSelectedTime(selectedTime: Long) {
@@ -50,10 +56,17 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _selectedTheme.value = userPreferencesRepository.isDarkTheme.first()
             _selectedTime.longValue = userPreferencesRepository.selectedTime.first()
+            _residentView.value = userPreferencesRepository.isResidentView.first()
         }
     }
 
     val isDark: StateFlow<Boolean> = userPreferencesRepository.isDarkTheme.map { it }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = true
+    )
+
+    val isResidentView: StateFlow<Boolean> = userPreferencesRepository.isResidentView.map { it }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = true
@@ -69,6 +82,12 @@ class SettingsViewModel @Inject constructor(
     fun saveThemePreferences(isDarkTheme: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreferences(isDarkTheme)
+        }
+    }
+
+    fun saveViewPreferences(isResidentView: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveView(isResidentView)
         }
     }
 

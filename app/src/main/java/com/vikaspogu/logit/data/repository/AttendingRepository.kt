@@ -8,4 +8,5 @@ interface AttendingRepository {
     suspend fun insertAttending(attending: Attending)
     suspend fun updateAttending(attending: Attending)
     suspend fun deleteAttending(id: Int)
+    suspend fun getAttendingIdByName(name: String): Flow<Int>
 }

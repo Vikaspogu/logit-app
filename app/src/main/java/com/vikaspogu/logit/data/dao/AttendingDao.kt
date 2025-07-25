@@ -13,8 +13,8 @@ interface AttendingDao {
     @Query("SELECT * FROM attending ORDER BY attending.name ASC")
     fun getAllAttending(): Flow<List<Attending>>
 
-    @Query("SELECT * from attending WHERE id = :id")
-    fun getType(id: Int): Flow<Attending>
+    @Query("SELECT id from attending WHERE lower(name) = :name")
+    fun getAttendingIdByName(name: String): Flow<Int>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(type: Attending)

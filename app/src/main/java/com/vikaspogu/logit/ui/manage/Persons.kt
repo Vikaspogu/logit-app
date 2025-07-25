@@ -53,6 +53,9 @@ import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Attending
 import com.vikaspogu.logit.ui.NavigationDestinations
+import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
+import com.vikaspogu.logit.ui.theme.TitleBarStyle
+import com.vikaspogu.logit.ui.theme.TitleStyle
 import com.vikaspogu.logit.ui.util.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -179,7 +182,7 @@ fun DialogManagePersons(
             ) {
                 Text(
                     text = stringResource(R.string.manage_names),
-                    style = MaterialTheme.typography.titleMedium
+                    style = TitleBarStyle
                 )
                 Spacer(modifier = Modifier.height(25.dp))
                 OutlinedTextField(
@@ -189,8 +192,8 @@ fun DialogManagePersons(
                     enabled = true,
                     label = {
                         Text(
-                            text = stringResource(id = R.string.manage_names),
-                            style = MaterialTheme.typography.bodyMedium
+                            text = stringResource(id = R.string.name),
+                            style = SmallHeadingStyle
                         )
                     },
                 )
@@ -206,7 +209,7 @@ fun DialogManagePersons(
                     ) {
                         Text(
                             stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = SmallHeadingStyle
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
@@ -228,7 +231,7 @@ fun DialogManagePersons(
                             } else {
                                 stringResource(R.string.update)
                             },
-                            style = MaterialTheme.typography.bodyMedium
+                            style = SmallHeadingStyle
                         )
                     }
                 }
@@ -248,7 +251,7 @@ fun PersonDetails(
             modifier = Modifier
                 .padding(16.dp),
             text = stringResource(id = R.string.manage_names),
-            style = MaterialTheme.typography.headlineLarge,
+            style = TitleStyle,
             color = MaterialTheme.colorScheme.inverseSurface
         )
         for (person in personList) {
@@ -294,7 +297,7 @@ fun PersonCard(person: Attending, modifier: Modifier, viewModel: ManagePersonsVi
         ) {
             Text(
                 text = person.name,
-                style = MaterialTheme.typography.bodyLarge,
+                style = TitleBarStyle,
                 modifier = modifier.weight(1f),
                 color = MaterialTheme.colorScheme.inverseSurface
             )

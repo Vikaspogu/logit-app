@@ -1,5 +1,6 @@
 package com.vikaspogu.logit.ui.entry
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -10,10 +11,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vikaspogu.logit.data.model.Attending
 import com.vikaspogu.logit.data.model.Entry
+import com.vikaspogu.logit.data.model.RegionalType
 import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.data.repository.AttendingRepository
 import com.vikaspogu.logit.data.repository.EntryRepository
+import com.vikaspogu.logit.data.repository.RegionalTypeRepository
 import com.vikaspogu.logit.data.repository.TypeRepository
+import com.vikaspogu.logit.data.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,10 +36,18 @@ class AddEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val entryRepository: EntryRepository,
     private val typeRepository: TypeRepository,
-    private val attendingRepository: AttendingRepository
+    private val attendingRepository: AttendingRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val regionalTypeRepository: RegionalTypeRepository
 ) : ViewModel() {
 
     var addEntryUiState by mutableStateOf(AddEntryUiState())
+
+    private val _residentView = mutableStateOf(false)
+    var residentView: MutableState<Boolean> = _residentView
+
+    private val _username = mutableStateOf("")
+    var username: MutableState<String> = _username
 
     private val _selectedProcedure = mutableStateOf("")
     var selectedProcedure: State<String> = _selectedProcedure
@@ -53,6 +65,30 @@ class AddEntryViewModel @Inject constructor(
     var selectedGender: State<String> = _selectedGender
     fun updateSelectedGender(text: String) {
         _selectedGender.value = text
+    }
+
+    private val _selectedClinical= mutableStateOf(false)
+    var selectedClinical: State<Boolean> = _selectedClinical
+    fun updateSelectedClinical(text: Boolean) {
+        _selectedClinical.value = text
+    }
+
+    private val _selectedCVC= mutableStateOf(false)
+    var selectedCVC: State<Boolean> = _selectedCVC
+    fun updateSelectedCVC(text: Boolean) {
+        _selectedCVC.value = text
+    }
+
+    private val _selectedRegional= mutableStateOf(false)
+    var selectedRegional: State<Boolean> = _selectedRegional
+    fun updateSelectedRegional(text: Boolean) {
+        _selectedRegional.value = text
+    }
+
+    private val _selectedRegionalType = mutableStateOf("")
+    var selectedRegionalType: State<String> = _selectedRegionalType
+    fun updateSelectedRegionalType(text: String) {
+        _selectedRegionalType.value = text
     }
 
     private val _selectedDate = mutableLongStateOf(Calendar.getInstance().timeInMillis)
@@ -76,6 +112,14 @@ class AddEntryViewModel @Inject constructor(
         initialValue = AttendingUiState()
     )
 
+    val regionalTypeUiState: StateFlow<RegionalTypeUiState> = regionalTypeRepository.getAllRegionalType().map {
+        RegionalTypeUiState(it)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+        initialValue = RegionalTypeUiState()
+    )
+
     private val entryId: String = checkNotNull(savedStateHandle["entryId"])
     val action: String = checkNotNull(savedStateHandle["action"])
 
@@ -85,6 +129,8 @@ class AddEntryViewModel @Inject constructor(
                 .toAddEntryUiState()
             _selectedGender.value = addEntryUiState.addEntry.gender
             _selectedDate.longValue = addEntryUiState.addEntry.entryDate
+            _residentView.value = userPreferencesRepository.isResidentView.first()
+            _username.value = userPreferencesRepository.username.toString()
         }
     }
 
@@ -99,6 +145,9 @@ class AddEntryViewModel @Inject constructor(
     fun saveEntry() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                if (addEntryUiState.addEntry.attendingId == 0 && !residentView.value){
+                    addEntryUiState.addEntry.attendingId = attendingRepository.getAttendingIdByName(userPreferencesRepository.username.first().lowercase()).first()
+                }
                 entryRepository.insertEntry(addEntryUiState.addEntry.toEntry())
             }
         }
@@ -120,6 +169,14 @@ class AddEntryViewModel @Inject constructor(
         }
     }
 
+    fun addRegionalType(regionalTypeName: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                regionalTypeRepository.insertRegionalType(RegionalType(0, regionalTypeName.trim()))
+            }
+        }
+    }
+
     fun updateUiState(addEntry: AddEntry) {
         addEntryUiState = AddEntryUiState(addEntry = addEntry)
     }
@@ -133,6 +190,8 @@ data class TypesUiState(val types: List<Type> = listOf())
 
 data class AttendingUiState(val attending: List<Attending> = listOf())
 
+data class RegionalTypeUiState(val types: List<RegionalType> = listOf())
+
 data class AddEntryUiState(
     val addEntry: AddEntry = AddEntry()
 )
@@ -145,7 +204,11 @@ data class AddEntry(
     var age: String = "",
     var id: Int = 0,
     var typeId: Int = 0,
-    var gender: String = ""
+    var gender: String = "",
+    var asa: String = "",
+    var clinical: String = "",
+    var cvc: String = "",
+    var regionalId: Int? = null,
 )
 
 fun AddEntry.toEntry(): Entry = Entry(
@@ -156,7 +219,11 @@ fun AddEntry.toEntry(): Entry = Entry(
     gender = gender,
     attendingId = attendingId,
     age = age.toIntOrNull() ?: 0,
-    typeId = typeId
+    typeId = typeId,
+    asa = asa.toIntOrNull() ?:0,
+    clinical = clinical,
+    cvc = cvc,
+    regionalId = regionalId,
 )
 
 fun Entry.toAddEntryUiState(): AddEntryUiState = AddEntryUiState(
@@ -171,5 +238,9 @@ fun Entry.toAddEntry(): AddEntry = AddEntry(
     age = age.toString(),
     id = id,
     typeId = typeId,
-    gender = gender
+    gender = gender,
+    asa = asa.toString(),
+    cvc = cvc,
+    clinical = clinical,
+    regionalId = regionalId ?:null
 )

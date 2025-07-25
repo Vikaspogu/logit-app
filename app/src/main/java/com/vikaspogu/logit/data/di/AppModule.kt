@@ -12,13 +12,17 @@ import androidx.room.Room
 import com.vikaspogu.logit.data.LogItDatabase
 import com.vikaspogu.logit.data.dao.AttendingDao
 import com.vikaspogu.logit.data.dao.EntryDao
+import com.vikaspogu.logit.data.dao.RegionalTypeDao
 import com.vikaspogu.logit.data.dao.TypeDao
 import com.vikaspogu.logit.data.migrations.MIGRATION_3_4
+import com.vikaspogu.logit.data.migrations.MIGRATION_4_5
 import com.vikaspogu.logit.data.repository.AttendingRepository
 import com.vikaspogu.logit.data.repository.EntryRepository
 import com.vikaspogu.logit.data.repository.OfflineAttendingRepository
 import com.vikaspogu.logit.data.repository.OfflineEntryRepository
+import com.vikaspogu.logit.data.repository.OfflineRegionalTypeRepository
 import com.vikaspogu.logit.data.repository.OfflineTypeRepository
+import com.vikaspogu.logit.data.repository.RegionalTypeRepository
 import com.vikaspogu.logit.data.repository.TypeRepository
 import com.vikaspogu.logit.data.repository.WorkerManagerReminderRepository
 import dagger.Module
@@ -42,6 +46,7 @@ object AppModule {
         Room.databaseBuilder(context, LogItDatabase::class.java, LogItDatabase.DATABASE_NAME)
             .createFromAsset("database/logit_database.db")
             .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
             .build()
 
     @Singleton
@@ -58,6 +63,10 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun providesRegionalTypeDao(database: LogItDatabase): RegionalTypeDao = database.regionalTypeDao()
+
+    @Singleton
+    @Provides
     fun provideEntryRepository(entryDao: EntryDao): EntryRepository = OfflineEntryRepository(entryDao)
 
     @Singleton
@@ -67,6 +76,10 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTypeRepository(typeDao: TypeDao): TypeRepository = OfflineTypeRepository(typeDao)
+
+    @Singleton
+    @Provides
+    fun provideRegionalTypeRepository(regionalTypeDao: RegionalTypeDao): RegionalTypeRepository = OfflineRegionalTypeRepository(regionalTypeDao)
 
     @Singleton
     @Provides

@@ -28,6 +28,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.navigation.BottomNavigationItem
+import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
+import com.vikaspogu.logit.ui.theme.TitleBarStyleLarge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +43,7 @@ fun TopBar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.displayMedium
+                    style = TitleBarStyleLarge
                 )
                 Image(
                     modifier = Modifier
@@ -77,7 +79,7 @@ fun BottomBar(navController: NavHostController) {
             NavigationBarItem(
                 selected = currentRoute == navigationItem.route,
                 label = {
-                    Text(navigationItem.label, style = MaterialTheme.typography.labelMedium)
+                    Text(navigationItem.label, style = SmallHeadingStyle)
                 },
                 icon = {
                     Icon(

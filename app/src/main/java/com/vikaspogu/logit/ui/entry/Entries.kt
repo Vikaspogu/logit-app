@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -41,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +53,10 @@ import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.components.BottomBar
 import com.vikaspogu.logit.ui.components.TopBar
+import com.vikaspogu.logit.ui.home.ChipView
+import com.vikaspogu.logit.ui.theme.HeadingStyle
+import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
+import com.vikaspogu.logit.ui.theme.TitleBarStyle
 import com.vikaspogu.logit.ui.util.Constants
 
 @Composable
@@ -94,7 +98,6 @@ private fun Entries(
         modifier = modifier, contentPadding = contentPadding
     ) {
         items(entries) { item ->
-//            ItemEntryCard(entry = item,modifier)
             EntriesCard(
                 entry = item,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
@@ -112,7 +115,7 @@ fun EmptyEntries(modifier: Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "You don't have any entries", style = MaterialTheme.typography.headlineSmall)
+        Text(text = "You don't have any entries", style = HeadingStyle)
     }
 }
 
@@ -135,12 +138,13 @@ private fun EntriesCard(
         mutableStateOf(false)
     }
 
-    Surface(shape = MaterialTheme.shapes.large,
+    Surface(
+        shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.primaryContainer,
         shadowElevation = 5.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
+            .padding(top = 10.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
             .clickable {
                 navController.navigate(
                     "addEdit/{action}/{entryId}"
@@ -158,68 +162,97 @@ private fun EntriesCard(
             ), verticalAlignment = Alignment.Top
         ) {
             Column(
-                modifier = modifier.weight(1f)
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
             ) {
-                Text(
-                    text = entry.type,
-                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.inverseSurface
-                )
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Icon(
-                        imageVector = Icons.Filled.Face,
-                        contentDescription = stringResource(id = R.string.attending)
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
-                        text = entry.attendingName,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp, 12.dp, 12.dp, 0.dp),
-                        style = MaterialTheme.typography.titleMedium,
+                        text = entry.type,
+                        modifier = Modifier.padding(end = 0.dp),
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Icon(
-                        imageVector = Icons.Outlined.DateRange, contentDescription = stringResource(
-                            id = R.string.date
-                        )
+                        style = HeadingStyle,
+                        color = MaterialTheme.colorScheme.inverseSurface,
                     )
                     Text(
-                        text = buildString {
-                            append(entry.entryDate.formatDate())
-                        },
-                        modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 5.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.inverseSurface
+                        text = entry.entryDate.formatDate(),
+                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
+                        style = SmallHeadingStyle,
                     )
                 }
+                Row {
+                    ChipView(entry.gender, colorResource(id = R.color.blue))
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    if (entry.clinical == "Yes") {
+                        ChipView(stringResource(R.string.clinical), colorResource(id = R.color.teal_700))
+                    }
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    if (entry.cvc == "Yes") {
+                        ChipView(stringResource(R.string.cvc), colorResource(id = R.color.red))
+                    }
+                }
+                if (viewModel.residentView.value) {
+                    Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Face,
+                            contentDescription = stringResource(id = R.string.attending)
+                        )
+                        Text(
+                            text = entry.attendingName,
+                            modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
+                            style = TitleBarStyle,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.inverseSurface,
+                        )
+                    }
+                }
+
                 Text(
                     text = buildString {
-                        append(entry.age)
-                        append(" yrs | ")
-                        append(entry.gender)
-                        append(" | ")
-                        append(entry.quantity)
-                        append(" quantity")
+                        if (viewModel.residentView.value) {
+                            append("Age: ")
+                            append(entry.age)
+                            appendLine()
+                            append("Quantity: ")
+                            append(entry.quantity)
+
+                        } else {
+                            append("ASA: ")
+                            append(entry.asa)
+                        }
                     },
-                    modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.inverseSurface
+                    modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.inverseSurface,
                 )
+                if (entry.regionalType != null){
+                    Text(
+                        text = buildString {
+                            append("Regional Type: ")
+                            append(entry.regionalType)
+                        },
+                        modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.inverseSurface,
+                    )
+                }
                 if (!hideOverFlowingText) {
                     Text(
-                        text = entry.notes,
+                        text = buildString {
+                            append("Notes: ")
+                            append(entry.notes)
+                        },
                         maxLines = 2,
                         onTextLayout = {
                             if (it.hasVisualOverflow) {
                                 showMoreButton = true
                             }
                         },
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
                         color = MaterialTheme.colorScheme.inverseSurface
                     )
@@ -228,16 +261,19 @@ private fun EntriesCard(
                 if (showMoreButton) {
                     AnimatedVisibility(expanded) {
                         Text(
-                            text = entry.notes,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                            text = buildString {
+                                append("Notes: ")
+                                append(entry.notes)
+                            },
+                            style = SmallHeadingStyle,
+                            modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp),
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
                     }
                     Box(
                         modifier = Modifier
                             .wrapContentWidth()
-                            .padding(top = 10.dp)
+                            .padding(top = 5.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.inversePrimary)
                             .clickable(onClick = {
@@ -250,7 +286,7 @@ private fun EntriesCard(
                                 id = R.string.hide_notes
                             ),
                             modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = SmallHeadingStyle,
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
                     }
@@ -267,7 +303,8 @@ private fun EntriesCard(
                 Spacer(modifier = modifier.weight(1f))
 
             }
-            if (openDialog) AlertDialog(shape = RoundedCornerShape(25.dp),
+            if (openDialog) AlertDialog(
+                shape = RoundedCornerShape(25.dp),
                 onDismissRequest = { openDialog = false },
                 title = { Text(stringResource(R.string.delete_confirmation_title)) },
                 text = {
@@ -275,7 +312,7 @@ private fun EntriesCard(
                         stringResource(
                             R.string.delete_confirmation_message
                         ),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = SmallHeadingStyle,
                         color = MaterialTheme.colorScheme.inverseSurface
                     )
                 },
@@ -289,7 +326,7 @@ private fun EntriesCard(
                     ) {
                         Text(
                             stringResource(R.string.delete),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = SmallHeadingStyle,
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
                     }
@@ -300,7 +337,7 @@ private fun EntriesCard(
                     }) {
                         Text(
                             stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = SmallHeadingStyle,
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
                     }

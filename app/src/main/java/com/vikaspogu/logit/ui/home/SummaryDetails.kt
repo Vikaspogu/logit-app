@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +35,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,13 +48,19 @@ import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.EntryType
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.entry.formatDate
+import com.vikaspogu.logit.ui.theme.HeadingStyle
+import com.vikaspogu.logit.ui.theme.LegendHeadingMediumStyle
+import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
+import com.vikaspogu.logit.ui.theme.TitleBarStyle
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryDetailsScreen(
-    navController: NavHostController, modifier: Modifier, viewModel: SummaryDetailsViewModel = hiltViewModel()
+    navController: NavHostController,
+    modifier: Modifier,
+    viewModel: SummaryDetailsViewModel = hiltViewModel()
 ) {
     val entryTypeUiState by viewModel.entryTypeUiState.collectAsStateWithLifecycle()
     Scaffold(topBar = {
@@ -68,16 +75,20 @@ fun SummaryDetailsScreen(
             }
         })
     }, modifier = modifier.fillMaxSize()) {
-        LazyColumn(modifier=Modifier.padding(top = 20.dp)) {
+        LazyColumn(modifier = Modifier.padding(top = 20.dp)) {
             item {
-                SummaryDetailsColumn(entryTypeUiState.entryTypeList, modifier)
+                SummaryDetailsColumn(entryTypeUiState.entryTypeList, modifier, viewModel)
             }
         }
     }
 }
 
 @Composable
-fun SummaryDetailsColumn(entryList: List<EntryType>, modifier: Modifier) {
+fun SummaryDetailsColumn(
+    entryList: List<EntryType>,
+    modifier: Modifier,
+    viewModel: SummaryDetailsViewModel
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -87,7 +98,8 @@ fun SummaryDetailsColumn(entryList: List<EntryType>, modifier: Modifier) {
     ) {
         for (entry in entryList) {
             SummaryDetailsCard(
-                entry
+                entry,
+                viewModel
             )
         }
         Spacer(Modifier.height(16.dp))
@@ -95,7 +107,7 @@ fun SummaryDetailsColumn(entryList: List<EntryType>, modifier: Modifier) {
 }
 
 @Composable
-fun SummaryDetailsCard(entry: EntryType) {
+fun SummaryDetailsCard(entry: EntryType, viewModel: SummaryDetailsViewModel) {
     var expanded by remember {
         mutableStateOf(false)
     }
@@ -117,74 +129,106 @@ fun SummaryDetailsCard(entry: EntryType) {
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
         ) {
-            Text(
-                text = entry.type,
-                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.inverseSurface,
-            )
-            Row(verticalAlignment = Alignment.Bottom) {
-                Icon(
-                    imageVector = Icons.Filled.Face,
-                    contentDescription = stringResource(id = R.string.attending)
-                )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
-                    text = entry.attendingName,
-                    modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 0.dp),
-                    style = MaterialTheme.typography.titleMedium,
+                    text = entry.type,
+                    modifier = Modifier.padding(end = 0.dp),
                     fontWeight = FontWeight.Bold,
+                    style = HeadingStyle,
                     color = MaterialTheme.colorScheme.inverseSurface,
-                )
-            }
-            Row(verticalAlignment = Alignment.Bottom) {
-                Icon(
-                    imageVector = Icons.Outlined.DateRange, contentDescription = stringResource(
-                        id = R.string.date
-                    )
                 )
                 Text(
-                    text = buildString {
-                        append(entry.entryDate.formatDate())
-                    },
-                    modifier = Modifier.padding(5.dp, 12.dp, 12.dp, 5.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.inverseSurface,
+                    text = entry.entryDate.formatDate(),
+                    style = SmallHeadingStyle,
                 )
             }
+            Row {
+                ChipView(entry.gender, colorResource(id = R.color.blue))
+                Spacer(modifier = Modifier.padding(5.dp))
+                if (entry.clinical == "Yes") {
+                    ChipView(stringResource(R.string.clinical), colorResource(id = R.color.teal_700))
+                }
+                Spacer(modifier = Modifier.padding(5.dp))
+                if (entry.cvc == "Yes") {
+                    ChipView(stringResource(R.string.cvc), colorResource(id = R.color.red))
+                }
+            }
+            if (viewModel.residentView.value) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Icon(
+                        imageVector = Icons.Filled.Face,
+                        contentDescription = stringResource(id = R.string.attending)
+                    )
+                    Text(
+                        text = entry.attendingName,
+                        modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
+                        style = TitleBarStyle,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.inverseSurface,
+                    )
+                }
+            }
+
             Text(
                 text = buildString {
-                    append(entry.age)
-                    append(" yrs | ")
-                    append(entry.gender)
-                    append(" | ")
-                    append(entry.quantity)
-                    append(" quantity")
+                    if (viewModel.residentView.value) {
+                        append("Age: ")
+                        append(entry.age)
+                        appendLine()
+                        append("Quantity: ")
+                        append(entry.quantity)
+
+                    } else {
+                        append("ASA: ")
+                        append(entry.asa)
+                    }
                 },
-                modifier = Modifier.padding(5.dp, 5.dp, 12.dp, 10.dp),
-                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.inverseSurface,
             )
-            if(!hideOverFlowingText){
+            if (entry.regionalType != null){
                 Text(
-                    text = entry.notes,
+                    text = buildString {
+                        append("Regional Type: ")
+                        append(entry.regionalType)
+                    },
+                    modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.inverseSurface,
+                )
+            }
+            if (!hideOverFlowingText) {
+                Text(
+                    text = buildString {
+                        append("Notes: ")
+                        append(entry.notes)
+                    },
                     maxLines = 2,
                     onTextLayout = {
-                        if(it.hasVisualOverflow){
-                            showMoreButton=true
+                        if (it.hasVisualOverflow) {
+                            showMoreButton = true
                         }
                     },
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp),
                     color = MaterialTheme.colorScheme.inverseSurface,
                 )
             }
 
-            if(showMoreButton){
+            if (showMoreButton) {
                 AnimatedVisibility(expanded) {
                     Text(
-                        text = entry.notes,
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = buildString {
+                            append("Notes: ")
+                            append(entry.notes)
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
                     )
                 }
@@ -202,12 +246,29 @@ fun SummaryDetailsCard(entry: EntryType) {
                     Text(
                         text = if (!expanded) stringResource(id = R.string.show_notes) else stringResource(
                             id = R.string.hide_notes
-                        ), modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
-                        style = MaterialTheme.typography.bodyMedium,
+                        ),
+                        modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.inverseSurface,
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ChipView(gender: String, colorResource: Color) {
+    Box(
+        modifier = Modifier
+            .wrapContentWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(colorResource.copy(.25f))
+    ) {
+        Text(
+            text = gender, modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
+            style = LegendHeadingMediumStyle,
+            color = colorResource
+        )
     }
 }

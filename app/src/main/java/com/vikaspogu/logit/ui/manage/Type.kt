@@ -53,6 +53,9 @@ import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
 import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
+import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
+import com.vikaspogu.logit.ui.theme.TitleBarStyle
+import com.vikaspogu.logit.ui.theme.TitleStyle
 import com.vikaspogu.logit.ui.util.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -176,7 +179,7 @@ fun DialogManageTypes(
             ) {
                 Text(
                     text = stringResource(R.string.manage_types),
-                    style = MaterialTheme.typography.titleMedium
+                    style = TitleBarStyle
                 )
                 Spacer(modifier = Modifier.height(25.dp))
                 OutlinedTextField(
@@ -186,8 +189,8 @@ fun DialogManageTypes(
                     enabled = true,
                     label = {
                         Text(
-                            text = stringResource(id = R.string.manage_types),
-                            style = MaterialTheme.typography.bodyMedium
+                            text = stringResource(id = R.string.type),
+                            style = SmallHeadingStyle
                         )
                     },
                 )
@@ -203,7 +206,7 @@ fun DialogManageTypes(
                     ) {
                         Text(
                             stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = SmallHeadingStyle
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
@@ -225,7 +228,7 @@ fun DialogManageTypes(
                             } else {
                                 stringResource(R.string.update)
                             },
-                            style = MaterialTheme.typography.bodyMedium
+                            style = SmallHeadingStyle
                         )
                     }
                 }
@@ -241,7 +244,7 @@ fun TypeDetails(typeList: List<Type>, modifier: Modifier, viewModel: ManageTypeV
             modifier = Modifier
                 .padding(16.dp),
             text = stringResource(id = R.string.manage_types),
-            style = MaterialTheme.typography.headlineLarge,
+            style = TitleStyle,
             color = MaterialTheme.colorScheme.inverseSurface
         )
         for (type in typeList) {
@@ -276,7 +279,7 @@ fun TypeCard(type: Type, modifier: Modifier, viewModel: ManageTypeViewModel) {
         ) {
             Text(
                 text = type.type,
-                style = MaterialTheme.typography.bodyLarge,
+                style = TitleBarStyle,
                 modifier = modifier.weight(1f),
                 color = MaterialTheme.colorScheme.inverseSurface
             )
