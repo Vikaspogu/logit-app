@@ -16,6 +16,7 @@ import com.vikaspogu.logit.data.dao.RegionalTypeDao
 import com.vikaspogu.logit.data.dao.TypeDao
 import com.vikaspogu.logit.data.migrations.MIGRATION_3_4
 import com.vikaspogu.logit.data.migrations.MIGRATION_4_5
+import com.vikaspogu.logit.data.migrations.MIGRATION_5_6
 import com.vikaspogu.logit.data.repository.AttendingRepository
 import com.vikaspogu.logit.data.repository.EntryRepository
 import com.vikaspogu.logit.data.repository.OfflineAttendingRepository
@@ -47,6 +48,8 @@ object AppModule {
             .createFromAsset("database/logit_database.db")
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
+            .addMigrations(MIGRATION_5_6)
+            .allowMainThreadQueries()
             .build()
 
     @Singleton

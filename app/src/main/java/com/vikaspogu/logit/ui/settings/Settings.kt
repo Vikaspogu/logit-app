@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -39,6 +40,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
@@ -115,6 +117,9 @@ fun SettingColumn(
     }
     val selectedDays by viewModel.reminderDays.collectAsStateWithLifecycle()
     var openDialog by remember {
+        mutableStateOf(false)
+    }
+    var deleteAllDialog by remember {
         mutableStateOf(false)
     }
     val launcher = rememberLauncherForActivityResult(
@@ -227,6 +232,23 @@ fun SettingColumn(
                     )
                 }
             }
+            SettingsBasicLinkItem(title = R.string.reset_all_data,
+                icon = R.drawable.delete_forever_24px,
+                onClick = {
+                    deleteAllDialog = true
+                })
+            when{
+                deleteAllDialog -> {
+                    AlertDialogDeleteAll(
+                        onDismissRequest = { deleteAllDialog = false },
+                        onConfirmation = {
+                            deleteAllDialog = false
+                            viewModel.clearAllTables()
+                        },
+                        icon = R.drawable.dangerous_24px
+                    )
+                }
+            }
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -251,6 +273,7 @@ fun SettingColumn(
                     )
                 })
             }
+
         }
         item {
             Text(
@@ -273,6 +296,42 @@ fun SettingColumn(
             )
         }
     }
+}
+
+@Composable
+fun AlertDialogDeleteAll(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    icon: Int,
+) {
+    AlertDialog(
+        icon = {
+            Icon(painter = painterResource(id = icon), contentDescription = "Danger")
+        },
+        title = { Text(stringResource(R.string.reset_all_data)) },
+        text = { Text(stringResource(R.string.are_you_sure_you_want_to_delete_all_data)) },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
 }
 
 @Composable

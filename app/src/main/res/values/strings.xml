@@ -55,4 +55,6 @@
     <string name="reminders">Reminders</string>
     <string name="select_days_for_reminder">Select Days for Reminder</string>
     <string name="reminder_message">Reminder to LogIt!</string>
+    <string name="reset_all_data">Reset all data</string>
+    <string name="are_you_sure_you_want_to_delete_all_data">Are you sure you want to delete all the data?</string>
 </resources>

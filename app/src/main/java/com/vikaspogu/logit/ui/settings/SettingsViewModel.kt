@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.RoomDatabase
+import com.vikaspogu.logit.data.LogItDatabase
 import com.vikaspogu.logit.data.repository.EntryRepository
 import com.vikaspogu.logit.data.repository.UserPreferencesRepository
 import com.vikaspogu.logit.data.repository.WorkerManagerReminderRepository
@@ -23,7 +25,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     entryRepository: EntryRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val workerManagerReminderRepository: WorkerManagerReminderRepository
+    private val workerManagerReminderRepository: WorkerManagerReminderRepository,
+    private val logItDatabase: LogItDatabase
 ) : ViewModel() {
 
     val entriesUiState: StateFlow<EntriesUiState> = entryRepository.getEntriesWithTypes().map {
@@ -106,6 +109,12 @@ class SettingsViewModel @Inject constructor(
     fun saveScheduleReminder(reminderDays: Set<String>, reminderTime: Long) {
         viewModelScope.launch {
             workerManagerReminderRepository.scheduleReminder(reminderDays, reminderTime)
+        }
+    }
+
+    fun clearAllTables(){
+        viewModelScope.launch {
+            logItDatabase.clearAllTables()
         }
     }
 

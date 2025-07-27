@@ -171,13 +171,15 @@ private fun EntriesCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = entry.type,
-                        modifier = Modifier.padding(end = 0.dp),
-                        fontWeight = FontWeight.Bold,
-                        style = HeadingStyle,
-                        color = MaterialTheme.colorScheme.inverseSurface,
-                    )
+                    entry.type?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier.padding(end = 0.dp),
+                            fontWeight = FontWeight.Bold,
+                            style = HeadingStyle,
+                            color = MaterialTheme.colorScheme.inverseSurface,
+                        )
+                    }
                     Text(
                         text = entry.entryDate.formatDate(),
                         modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
@@ -201,13 +203,15 @@ private fun EntriesCard(
                             imageVector = Icons.Filled.Face,
                             contentDescription = stringResource(id = R.string.attending)
                         )
-                        Text(
-                            text = entry.attendingName,
-                            modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
-                            style = TitleBarStyle,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.inverseSurface,
-                        )
+                        entry.attendingName?.let {
+                            Text(
+                                text = it,
+                                modifier = Modifier.padding(5.dp, 0.dp, 12.dp, 0.dp),
+                                style = TitleBarStyle,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.inverseSurface,
+                            )
+                        }
                     }
                 }
 

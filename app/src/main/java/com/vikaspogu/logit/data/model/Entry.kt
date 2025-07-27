@@ -11,12 +11,14 @@ import androidx.room.PrimaryKey
         ForeignKey(
             entity = Type::class,
             parentColumns = ["id"],
-            childColumns = ["type_id"]
+            childColumns = ["type_id"],
+            onDelete      = ForeignKey.SET_NULL
         ),
         ForeignKey(
             entity = Attending::class,
             parentColumns = ["id"],
-            childColumns = ["attending_id"]
+            childColumns = ["attending_id"],
+            onDelete      = ForeignKey.SET_NULL
         ),
         ForeignKey(
             entity = RegionalType::class,
@@ -34,11 +36,11 @@ data class Entry(
     val age: Int,
     val gender: String,
     @ColumnInfo(name = "attending_id", index = true)
-    val attendingId: Int,
+    val attendingId: Int? = null,
     @ColumnInfo(name = "entry_date")
     val entryDate: Long = 0L,
     @ColumnInfo(name = "type_id", index = true)
-    val typeId: Int,
+    val typeId: Int? = null,
     val asa: Int,
     val clinical: String,
     val cvc: String,

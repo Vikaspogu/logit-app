@@ -9,12 +9,12 @@ data class EntryType(
     val notes: String,
     val age: Int,
     @ColumnInfo(name = "attending_name")
-    val attendingName: String,
+    val attendingName: String?,
     @ColumnInfo(name = "entry_date")
     val entryDate: Long = 0L,
     @ColumnInfo(name = "type_id")
-    val typeId: Int,
-    val type: String,
+    val typeId: Int?,
+    val type: String?,
     val gender: String,
     val asa: Int,
     val clinical: String,

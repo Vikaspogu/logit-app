@@ -11,7 +11,7 @@ import com.vikaspogu.logit.data.model.Entry
 import com.vikaspogu.logit.data.model.RegionalType
 import com.vikaspogu.logit.data.model.Type
 
-@Database(entities = [Entry::class, Type::class,Attending::class, RegionalType::class], version = 5, exportSchema = false)
+@Database(entities = [Entry::class, Type::class,Attending::class, RegionalType::class], version = 6, exportSchema = false)
 abstract class LogItDatabase : RoomDatabase() {
 
     abstract fun entryDao(): EntryDao
@@ -22,4 +22,5 @@ abstract class LogItDatabase : RoomDatabase() {
     companion object {
         const val DATABASE_NAME = "logit_database"
     }
+
 }

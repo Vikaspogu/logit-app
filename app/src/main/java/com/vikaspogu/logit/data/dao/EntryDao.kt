@@ -19,10 +19,10 @@ interface EntryDao {
     @Query("SELECT * FROM entries")
     fun getAllEntries(): Flow<List<Entry>>
 
-    @Query("SELECT entries.id as entry_id,entries.quantity,entries.gender,entries.age,entries.asa,entries.clinical,entries.cvc,regional_type.name as regional_type,entries.notes,attending.name as attending_name,entries.entry_date,entries.type_id,types.type FROM entries INNER JOIN types ON entries.type_id=types.id INNER JOIN attending ON entries.attending_id=attending.id LEFT JOIN regional_type ON entries.regional_id=regional_type.id AND entries.regional_id IS NOT NULL ORDER BY types.type ASC")
+    @Query("SELECT entries.id as entry_id,entries.quantity,entries.gender,entries.age,entries.asa,entries.clinical,entries.cvc,regional_type.name as regional_type,entries.notes,attending.name as attending_name,entries.entry_date,entries.type_id,types.type FROM entries LEFT JOIN types ON entries.type_id=types.id AND entries.type_id IS NOT NULL LEFT JOIN attending ON entries.attending_id=attending.id AND entries.attending_id IS NOT NULL LEFT JOIN regional_type ON entries.regional_id=regional_type.id AND entries.regional_id IS NOT NULL ORDER BY types.type ASC")
     fun getAllEntriesWithTypes(): Flow<List<EntryType>>
 
-    @Query("SELECT entries.id as entry_id,entries.quantity,entries.gender,entries.age,entries.asa,entries.clinical,entries.cvc,regional_type.name as regional_type,entries.notes,attending.name as attending_name,entries.entry_date,entries.type_id,types.type FROM entries INNER JOIN types ON entries.type_id=types.id INNER JOIN attending ON entries.attending_id=attending.id LEFT JOIN regional_type ON entries.regional_id=regional_type.id AND entries.regional_id IS NOT NULL WHERE type_id = :typeId ORDER BY types.type ASC")
+    @Query("SELECT entries.id as entry_id,entries.quantity,entries.gender,entries.age,entries.asa,entries.clinical,entries.cvc,regional_type.name as regional_type,entries.notes,attending.name as attending_name,entries.entry_date,entries.type_id,types.type FROM entries LEFT JOIN types ON entries.type_id=types.id AND entries.type_id IS NOT NULL LEFT JOIN attending ON entries.attending_id=attending.id AND entries.attending_id IS NOT NULL LEFT JOIN regional_type ON entries.regional_id=regional_type.id AND entries.regional_id IS NOT NULL WHERE type_id = :typeId ORDER BY types.type ASC")
     fun getEntriesByType(typeId: Int): Flow<List<EntryType>>
 
     @Query("SELECT * from entries WHERE id = :id")
