@@ -51,7 +51,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.vikaspogu.logit.R
-import com.vikaspogu.logit.data.model.Attending
+import com.vikaspogu.logit.data.model.RegionalType
+import com.vikaspogu.logit.data.model.Type
 import com.vikaspogu.logit.ui.NavigationDestinations
 import com.vikaspogu.logit.ui.theme.SmallHeadingStyle
 import com.vikaspogu.logit.ui.theme.TitleBarStyle
@@ -60,17 +61,16 @@ import com.vikaspogu.logit.ui.util.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManagePersons(
+fun ManageRegionalType(
     navController: NavHostController,
     modifier: Modifier,
-    viewModel: ManagePersonsViewModel = hiltViewModel(),
+    viewModel: ManageRegionalTypeViewModel = hiltViewModel(),
 ) {
-
-    val personUiState by viewModel.personUiState.collectAsStateWithLifecycle()
+    val regionalTypeUiState by viewModel.regionalTypeUiState.collectAsStateWithLifecycle()
     var openDialog by remember {
         mutableStateOf(false)
     }
-    var person by remember {
+    var procedureType by remember {
         mutableStateOf("")
     }
     var isVisible by remember { mutableStateOf(true) }
@@ -116,7 +116,7 @@ fun ManagePersons(
             FloatingActionButton(
                 onClick = {
                     openDialog = true
-                    person = ""
+                    procedureType = ""
                 },
                 containerColor = MaterialTheme.colorScheme.inverseSurface,
             ) {
@@ -127,26 +127,24 @@ fun ManagePersons(
             }
         }
         when {
-            (openDialog) -> {
-                DialogManagePersons(
+            openDialog -> {
+                DialogManageRegionalTypes(
                     onDismissRequest = { openDialog = false },
                     onConfirmation = { openDialog = false },
-                    attending = Attending(0, ""),
+                    type = Type(0,""),
                     actionType = Constants.ADD,
                     viewModel = viewModel
                 )
             }
         }
-
-
     }) { innerPadding ->
         LazyColumn(
             contentPadding = innerPadding,
             modifier = modifier.nestedScroll(nestedScrollConnection)
         ) {
             item {
-                PersonDetails(
-                    personUiState.personList,
+                RegionalTypeDetails(
+                    regionalTypeUiState.typeList,
                     modifier,
                     viewModel
                 )
@@ -157,16 +155,16 @@ fun ManagePersons(
 }
 
 @Composable
-fun DialogManagePersons(
+fun DialogManageRegionalTypes(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
-    attending: Attending,
+    type: Type,
     actionType: String,
-    viewModel: ManagePersonsViewModel
+    viewModel: ManageRegionalTypeViewModel
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         var text by remember {
-            mutableStateOf(attending.name)
+            mutableStateOf(type.type)
         }
         Card(
             modifier = Modifier
@@ -181,7 +179,7 @@ fun DialogManagePersons(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.manage_names),
+                    text = stringResource(R.string.manage_regional_types),
                     style = TitleBarStyle
                 )
                 Spacer(modifier = Modifier.height(25.dp))
@@ -192,7 +190,7 @@ fun DialogManagePersons(
                     enabled = true,
                     label = {
                         Text(
-                            text = stringResource(id = R.string.name),
+                            text = stringResource(id = R.string.type),
                             style = SmallHeadingStyle
                         )
                     },
@@ -218,9 +216,9 @@ fun DialogManagePersons(
                         onClick = {
                             onConfirmation()
                             if (actionType == Constants.ADD) {
-                                viewModel.addPersons(text)
+                                viewModel.addRegionalType(text)
                             } else {
-                                viewModel.updatePersons(attending.id, text)
+                                viewModel.updateRegionalType(type.id, text)
                             }
 
                         },
@@ -241,22 +239,18 @@ fun DialogManagePersons(
 }
 
 @Composable
-fun PersonDetails(
-    personList: List<Attending>,
-    modifier: Modifier,
-    viewModel: ManagePersonsViewModel
-) {
+fun RegionalTypeDetails(typeList: List<RegionalType>, modifier: Modifier, viewModel: ManageRegionalTypeViewModel) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
         Text(
             modifier = Modifier
                 .padding(16.dp),
-            text = stringResource(id = R.string.attending_names),
+            text = stringResource(id = R.string.regional_types),
             style = TitleStyle,
             color = MaterialTheme.colorScheme.inverseSurface
         )
-        for (person in personList) {
-            PersonCard(
-                person, modifier, viewModel
+        for (type in typeList) {
+            RegionalTypeCard(
+                type, modifier, viewModel
             )
         }
         Spacer(Modifier.height(16.dp))
@@ -264,7 +258,7 @@ fun PersonDetails(
 }
 
 @Composable
-fun PersonCard(person: Attending, modifier: Modifier, viewModel: ManagePersonsViewModel) {
+fun RegionalTypeCard(type: RegionalType, modifier: Modifier, viewModel: ManageRegionalTypeViewModel) {
     var openDialog by remember {
         mutableStateOf(false)
     }
@@ -277,17 +271,6 @@ fun PersonCard(person: Attending, modifier: Modifier, viewModel: ManagePersonsVi
             .fillMaxWidth()
             .padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
     ) {
-        when {
-            (openDialog) -> {
-                DialogManagePersons(
-                    onDismissRequest = { openDialog = false },
-                    onConfirmation = { openDialog = false },
-                    attending = Attending(person.id, person.name),
-                    actionType = Constants.EDIT,
-                    viewModel = viewModel
-                )
-            }
-        }
         Row(
             modifier = modifier
                 .fillMaxWidth()
@@ -296,7 +279,7 @@ fun PersonCard(person: Attending, modifier: Modifier, viewModel: ManagePersonsVi
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = person.name,
+                text = type.name,
                 style = TitleBarStyle,
                 modifier = modifier.weight(1f),
                 color = MaterialTheme.colorScheme.inverseSurface
@@ -309,7 +292,7 @@ fun PersonCard(person: Attending, modifier: Modifier, viewModel: ManagePersonsVi
             }
             IconButton(onClick = {
                 try {
-                    viewModel.deletePersons(person.id)
+                    viewModel.deleteRegionalType(type.id)
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,
@@ -322,6 +305,17 @@ fun PersonCard(person: Attending, modifier: Modifier, viewModel: ManagePersonsVi
                     imageVector = Icons.Outlined.Delete,
                     contentDescription = stringResource(R.string.delete)
                 )
+            }
+            when {
+                openDialog -> {
+                    DialogManageRegionalTypes(
+                        onDismissRequest = { openDialog = false },
+                        onConfirmation = { openDialog = false },
+                        type = Type(id = type.id, type = type.name),
+                        actionType = Constants.EDIT,
+                        viewModel = viewModel
+                    )
+                }
             }
         }
     }

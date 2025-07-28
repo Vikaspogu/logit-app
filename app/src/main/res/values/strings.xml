@@ -23,9 +23,13 @@
     <string name="update">Update</string>
     <string name="project_on_github">https://github.com/Vikaspogu/logit-app.git</string>
     <string name="edit">Edit</string>
-    <string name="manage_types">Manage Types</string>
+    <string name="manage_types">Add/Edit Procedure Types</string>
+    <string name="types">Procedure Types</string>
+    <string name="manage_regional_types">Add/Edit Regional Types</string>
+    <string name="regional_types">Regional Types</string>
     <string name="type">Type</string>
-    <string name="manage_names">Manage Names</string>
+    <string name="manage_names">Add/Edit Attending Names</string>
+    <string name="attending_names">Attending Names</string>
     <string name="name">Name</string>
     <string name="export_csv">Export data to CSV</string>
     <string name="dark_theme">Dark Theme</string>

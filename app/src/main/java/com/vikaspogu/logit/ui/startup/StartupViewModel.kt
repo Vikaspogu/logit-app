@@ -4,8 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vikaspogu.logit.data.model.Attending
-import com.vikaspogu.logit.data.repository.AttendingRepository
 import com.vikaspogu.logit.data.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +14,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StartupViewModel @Inject constructor(
-    private val attendingRepository: AttendingRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
@@ -41,7 +38,6 @@ class StartupViewModel @Inject constructor(
     fun saveUsername(username: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                attendingRepository.insertAttending(Attending(0, username.trim()))
                 userPreferencesRepository.saveUsername(username.trim())
             }
         }
@@ -57,9 +53,5 @@ class StartupViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferencesRepository.saveView(isResidentView)
         }
-    }
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
 }

@@ -257,7 +257,7 @@ private fun EntriesCard(
                             }
                         },
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(5.dp, 5.dp, 0.dp, 0.dp),
+                        modifier = Modifier.padding(5.dp, 0.dp, 0.dp, 0.dp),
                         color = MaterialTheme.colorScheme.inverseSurface
                     )
                 }

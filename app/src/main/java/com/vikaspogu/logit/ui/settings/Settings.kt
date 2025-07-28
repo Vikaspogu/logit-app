@@ -200,6 +200,13 @@ fun SettingColumn(
                         navController.navigate(NavigationDestinations.Persons.name)
                     })
             }
+            if (!viewModel.residentView.value){
+                SettingsBasicLinkItem(title = R.string.manage_regional_types,
+                    icon = R.drawable.procedure_24px,
+                    onClick = {
+                        navController.navigate(NavigationDestinations.RegionalTypes.name)
+                    })
+            }
 
             SettingsBasicLinkItem(title = R.string.export_csv,
                 icon = R.drawable.ic_export_notes,

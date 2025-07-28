@@ -272,7 +272,7 @@ fun ChipView(gender: String, colorResource: Color) {
         Text(
             text = gender, modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
             style = LegendHeadingMediumStyle,
-            color = colorResource
+            color = MaterialTheme.colorScheme.inverseSurface
         )
     }
 }

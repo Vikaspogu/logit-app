@@ -243,7 +243,7 @@ fun TypeDetails(typeList: List<Type>, modifier: Modifier, viewModel: ManageTypeV
         Text(
             modifier = Modifier
                 .padding(16.dp),
-            text = stringResource(id = R.string.manage_types),
+            text = stringResource(id = R.string.types),
             style = TitleStyle,
             color = MaterialTheme.colorScheme.inverseSurface
         )
