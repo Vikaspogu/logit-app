@@ -23,11 +23,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -39,6 +42,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
@@ -54,6 +59,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -150,7 +157,7 @@ fun SettingColumn(
                     viewModel.updateSelectedView(!viewModel.residentView.value)
                     viewModel.saveViewPreferences(viewModel.residentView.value)
                 }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
-                    Row (verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.Person,
                             contentDescription = stringResource(id = R.string.attending)
@@ -167,7 +174,7 @@ fun SettingColumn(
                     viewModel.updateSelectedView(!viewModel.residentView.value)
                     viewModel.saveViewPreferences(viewModel.residentView.value)
                 }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
-                    Row (verticalAlignment = Alignment.CenterVertically){
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.Person,
                             contentDescription = stringResource(id = R.string.attending)
@@ -188,32 +195,37 @@ fun SettingColumn(
                 text = stringResource(id = R.string.settings),
                 style = HeadingStyle
             )
-            SettingsBasicLinkItem(title = R.string.manage_types,
+            SettingsBasicLinkItem(
+                title = R.string.manage_types,
                 icon = R.drawable.ic_code,
                 onClick = {
                     navController.navigate(NavigationDestinations.Types.name)
                 })
-            if (viewModel.residentView.value){
-                SettingsBasicLinkItem(title = R.string.manage_names,
+            if (viewModel.residentView.value) {
+                SettingsBasicLinkItem(
+                    title = R.string.manage_names,
                     icon = R.drawable.ic_accounts,
                     onClick = {
                         navController.navigate(NavigationDestinations.Persons.name)
                     })
             }
-            if (!viewModel.residentView.value){
-                SettingsBasicLinkItem(title = R.string.manage_regional_types,
+            if (!viewModel.residentView.value) {
+                SettingsBasicLinkItem(
+                    title = R.string.manage_regional_types,
                     icon = R.drawable.procedure_24px,
                     onClick = {
                         navController.navigate(NavigationDestinations.RegionalTypes.name)
                     })
             }
 
-            SettingsBasicLinkItem(title = R.string.export_csv,
+            SettingsBasicLinkItem(
+                title = R.string.export_csv,
                 icon = R.drawable.ic_export_notes,
                 onClick = {
                     chooseDirectoryLauncher.launch(null)
                 })
-            SettingsBasicLinkItem(title = R.string.reminders,
+            SettingsBasicLinkItem(
+                title = R.string.reminders,
                 icon = R.drawable.ic_notification,
                 onClick = {
                     val permission = Manifest.permission.POST_NOTIFICATIONS
@@ -223,6 +235,7 @@ fun SettingColumn(
                         ) == PackageManager.PERMISSION_GRANTED -> {
                             openDialog = true
                         }
+
                         else -> {
                             launcher.launch(permission)
                         }
@@ -239,12 +252,13 @@ fun SettingColumn(
                     )
                 }
             }
-            SettingsBasicLinkItem(title = R.string.reset_all_data,
+            SettingsBasicLinkItem(
+                title = R.string.reset_all_data,
                 icon = R.drawable.delete_forever_24px,
                 onClick = {
                     deleteAllDialog = true
                 })
-            when{
+            when {
                 deleteAllDialog -> {
                     AlertDialogDeleteAll(
                         onDismissRequest = { deleteAllDialog = false },
@@ -256,31 +270,32 @@ fun SettingColumn(
                     )
                 }
             }
-            SingleChoiceSegmentedButtonRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 5.dp),
-            ) {
-                SegmentedButton(selected = !viewModel.selectedTheme.value, onClick = {
+            SettingsBasicCheckItem(
+                title = R.string.dark_theme,
+                icon = R.drawable.dark_mode_20px,
+                onClick = {
                     viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
-                    viewModel.saveThemePreferences(viewModel.selectedTheme.value)
-                }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
-                    Text(
-                        text = stringResource(id = R.string.light_theme),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                })
-                SegmentedButton(selected = viewModel.selectedTheme.value, onClick = {
-                    viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
-                    viewModel.saveThemePreferences(viewModel.selectedTheme.value)
-                }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
-                    Text(
-                        text = stringResource(id = R.string.dark_theme),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                })
-            }
+                    if (viewModel.selectedTheme.value){
+                        viewModel.saveThemePreferences(viewModel.selectedTheme.value)
+                    } else{
+                        viewModel.saveThemePreferences(viewModel.selectedTheme.value)
+                    }
 
+                }, activated = viewModel.selectedTheme.value
+            )
+            SettingsBasicCheckItem(
+                title = R.string.dynamic_theme,
+                icon = R.drawable.palette_24px,
+                onClick = {
+                    viewModel.updateSelectedDynamicTheme(!viewModel.selectedDynamicTheme.value)
+                    if (viewModel.selectedDynamicTheme.value){
+                        viewModel.saveDynamicThemePreferences(viewModel.selectedDynamicTheme.value)
+                    } else{
+                        viewModel.saveDynamicThemePreferences(viewModel.selectedDynamicTheme.value)
+                    }
+
+                }, activated = viewModel.selectedDynamicTheme.value
+            )
         }
         item {
             Text(
@@ -373,6 +388,61 @@ fun SettingsBasicLinkItem(
             text = subtitle,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.inverseSurface
+        )
+    }
+}
+
+@Composable
+fun SettingsBasicCheckItem(
+    @StringRes title: Int,
+    subtitle: String = "",
+    @DrawableRes icon: Int,
+    link: String = "",
+    activated: Boolean,
+    onClick: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    SettingsSwitchItemCard(onClick = {
+        if (link.isNotBlank()) {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(link)
+            context.startActivity(intent)
+        } else onClick()
+    }) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = stringResource(id = title)
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                text = stringResource(id = title),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.inverseSurface
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(
+                modifier = Modifier.semantics { contentDescription = context.getString(R.string.dark_theme) },
+                checked = activated,
+                onCheckedChange = { onClick?.invoke() },
+                thumbContent = { SwitchThumbIcon(checked = activated) },
+            )
+        }
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.inverseSurface
+        )
+    }
+}
+
+@Composable
+fun SwitchThumbIcon(checked: Boolean) {
+    if (checked) {
+        Icon(
+            imageVector = Icons.Filled.Check,
+            contentDescription = null,
+            modifier = Modifier.size(SwitchDefaults.IconSize),
         )
     }
 }
@@ -493,6 +563,31 @@ fun SettingsItemCard(
     modifier: Modifier = Modifier,
     hPadding: Dp = 12.dp,
     vPadding: Dp = 16.dp,
+    onClick: () -> Unit = {},
+    content: @Composable RowScope.() -> Unit,
+) {
+    Surface(
+        modifier = modifier.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        shadowElevation = 5.dp
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(horizontal = hPadding, vertical = vPadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            content = content)
+    }
+}
+
+@Composable
+fun SettingsSwitchItemCard(
+    modifier: Modifier = Modifier,
+    hPadding: Dp = 12.dp,
+    vPadding: Dp = 3.dp,
     onClick: () -> Unit = {},
     content: @Composable RowScope.() -> Unit,
 ) {

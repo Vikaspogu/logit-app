@@ -245,13 +245,14 @@ private val highContrastDarkColorScheme = darkColorScheme(
 fun LogItTheme(
     content: @Composable () -> Unit
 ) {
-    val dynamicColor = true
+
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val isDark by settingsViewModel.isDark.collectAsStateWithLifecycle()
+    val isDynamic  by settingsViewModel.isDynamic.collectAsStateWithLifecycle()
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        isDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (isDark && isDynamic) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
         isDark -> darkScheme

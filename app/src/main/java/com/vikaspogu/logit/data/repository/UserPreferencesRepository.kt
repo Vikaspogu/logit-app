@@ -25,7 +25,16 @@ class UserPreferencesRepository @Inject constructor(private val dataStore: DataS
         } else {
             throw it
         }
-    }.map { preferences -> preferences[IS_DARK_THEME] ?: false }
+    }.map { preferences -> preferences[IS_DARK_THEME] ?: true }
+
+    val isDynamicTheme: Flow<Boolean> = dataStore.data.catch {
+        if (it is IOException) {
+            Log.e(TAG, "Error reading preferences.", it)
+            emit(emptyPreferences())
+        } else {
+            throw it
+        }
+    }.map { preferences -> preferences[IS_DYNAMIC_THEME] ?: true }
 
     val isResidentView: Flow<Boolean> = dataStore.data.catch {
         if (it is IOException) {
@@ -56,6 +65,7 @@ class UserPreferencesRepository @Inject constructor(private val dataStore: DataS
     private companion object {
         val USERNAME = stringPreferencesKey("username")
         val IS_DARK_THEME = booleanPreferencesKey("is_dark_theme")
+        val IS_DYNAMIC_THEME = booleanPreferencesKey("is_dynamic_theme")
         val IS_RESIDENT_VIEW = booleanPreferencesKey("is_resident_view")
         val REMINDER_DAYS = stringSetPreferencesKey("reminder_days")
         val REMINDER_TIME = longPreferencesKey("reminder_time")
@@ -64,6 +74,12 @@ class UserPreferencesRepository @Inject constructor(private val dataStore: DataS
     suspend fun saveView(isResidentView: Boolean) {
         dataStore.edit { preferences ->
             preferences[IS_RESIDENT_VIEW] = isResidentView
+        }
+    }
+
+    suspend fun saveDynamicThemePreferences(isDynamicTheme: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[IS_DYNAMIC_THEME] = isDynamicTheme
         }
     }
 

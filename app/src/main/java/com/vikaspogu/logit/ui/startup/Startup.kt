@@ -155,45 +155,6 @@ fun StartupScreen(
                     }
                 })
             }
-            SingleChoiceSegmentedButtonRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 5.dp),
-            ) {
-                SegmentedButton(selected = !viewModel.selectedTheme.value, onClick = {
-                    viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
-                    viewModel.saveThemePreferences(viewModel.selectedTheme.value)
-                }, shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp), label = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            modifier = Modifier.padding(end = 3.dp),
-                            painter = painterResource(id = R.drawable.light_mode_20px),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = stringResource(id = R.string.light_theme),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                })
-                SegmentedButton(selected = viewModel.selectedTheme.value, onClick = {
-                    viewModel.updateSelectedTheme(!viewModel.selectedTheme.value)
-                    viewModel.saveThemePreferences(viewModel.selectedTheme.value)
-                }, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp), label = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            modifier = Modifier.padding(end = 3.dp),
-                            painter = painterResource(id = R.drawable.dark_mode_20px),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = stringResource(id = R.string.dark_theme),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                })
-            }
-
         }
     }
 }

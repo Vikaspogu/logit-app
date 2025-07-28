@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.RoomDatabase
 import com.vikaspogu.logit.data.LogItDatabase
 import com.vikaspogu.logit.data.repository.EntryRepository
 import com.vikaspogu.logit.data.repository.UserPreferencesRepository
@@ -43,6 +42,12 @@ class SettingsViewModel @Inject constructor(
         _selectedTheme.value = theme
     }
 
+    private val _selectedDynamicTheme = mutableStateOf(false)
+    var selectedDynamicTheme: MutableState<Boolean> = _selectedDynamicTheme
+    fun updateSelectedDynamicTheme(theme: Boolean) {
+        _selectedDynamicTheme.value = theme
+    }
+
     private val _residentView = mutableStateOf(false)
     var residentView: MutableState<Boolean> = _residentView
     fun updateSelectedView(view: Boolean) {
@@ -60,6 +65,7 @@ class SettingsViewModel @Inject constructor(
             _selectedTheme.value = userPreferencesRepository.isDarkTheme.first()
             _selectedTime.longValue = userPreferencesRepository.selectedTime.first()
             _residentView.value = userPreferencesRepository.isResidentView.first()
+            _selectedDynamicTheme.value = userPreferencesRepository.isDynamicTheme.first()
         }
     }
 
@@ -69,7 +75,7 @@ class SettingsViewModel @Inject constructor(
         initialValue = true
     )
 
-    val isResidentView: StateFlow<Boolean> = userPreferencesRepository.isResidentView.map { it }.stateIn(
+    val isDynamic: StateFlow<Boolean> = userPreferencesRepository.isDynamicTheme.map { it }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = true
@@ -85,6 +91,12 @@ class SettingsViewModel @Inject constructor(
     fun saveThemePreferences(isDarkTheme: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreferences(isDarkTheme)
+        }
+    }
+
+    fun saveDynamicThemePreferences(isDynamicTheme: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveDynamicThemePreferences(isDynamicTheme)
         }
     }
 

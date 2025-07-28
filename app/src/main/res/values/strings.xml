@@ -32,6 +32,7 @@
     <string name="attending_names">Attending Names</string>
     <string name="name">Name</string>
     <string name="export_csv">Export data to CSV</string>
+    <string name="dynamic_theme">Dynamic Theme</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="light_theme">Light Theme</string>
     <string name="attendant">Attending</string>

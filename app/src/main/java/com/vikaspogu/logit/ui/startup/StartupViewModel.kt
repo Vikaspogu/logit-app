@@ -23,12 +23,6 @@ class StartupViewModel @Inject constructor(
         _username.value = text
     }
 
-    private val _selectedTheme = mutableStateOf(false)
-    var selectedTheme: MutableState<Boolean> = _selectedTheme
-    fun updateSelectedTheme(theme: Boolean) {
-        _selectedTheme.value = theme
-    }
-
     private val _residentView = mutableStateOf(false)
     var residentView: MutableState<Boolean> = _residentView
     fun updateSelectedView(view: Boolean) {
@@ -40,12 +34,6 @@ class StartupViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 userPreferencesRepository.saveUsername(username.trim())
             }
-        }
-    }
-
-    fun saveThemePreferences(isDarkTheme: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveThemePreferences(isDarkTheme)
         }
     }
 
