@@ -150,10 +150,12 @@ fun SummaryDetailsCard(entry: EntryType, viewModel: SummaryDetailsViewModel) {
                 )
             }
             Row {
-                ChipView(entry.gender, colorResource(id = R.color.blue))
-                Spacer(modifier = Modifier.padding(5.dp))
+                if (viewModel.residentView.value) {
+                    ChipView(entry.gender, colorResource(id = R.color.blue))
+                    Spacer(modifier = Modifier.padding(5.dp))
+                }
                 if (entry.clinical == "Yes") {
-                    ChipView(stringResource(R.string.clinical), colorResource(id = R.color.teal_700))
+                    ChipView(stringResource(R.string.aline), colorResource(id = R.color.teal_700))
                 }
                 Spacer(modifier = Modifier.padding(5.dp))
                 if (entry.cvc == "Yes") {

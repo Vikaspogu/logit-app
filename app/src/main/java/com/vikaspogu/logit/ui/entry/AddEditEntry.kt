@@ -115,34 +115,28 @@ fun AddEditForm(
     }
     val radioOptions = listOf("Male", "Female")
     val isButtonEnabled = if (viewModel.residentView.value) {
-        addEntry.age.isNotEmpty()
-                && addEntry.quantity.isNotEmpty()
-                && addEntry.gender.isNotEmpty()
-                && viewModel.selectedAttending.value.isNotEmpty()
-                && viewModel.selectedProcedure.value.isNotEmpty()
+        addEntry.age.isNotEmpty() && addEntry.quantity.isNotEmpty() && addEntry.gender.isNotEmpty() && viewModel.selectedAttending.value.isNotEmpty() && viewModel.selectedProcedure.value.isNotEmpty()
     } else {
-        addEntry.asa.isNotEmpty()
-                && addEntry.gender.isNotEmpty()
-                && viewModel.selectedProcedure.value.isNotEmpty()
+        addEntry.asa.isNotEmpty() && addEntry.gender.isNotEmpty() && viewModel.selectedProcedure.value.isNotEmpty()
     }
-    if (addEntry.clinical == "Yes"){
+    if (addEntry.clinical == "Yes") {
         LaunchedEffect(viewModel.selectedClinical) {
             viewModel.updateSelectedClinical(true)
         }
     }
-    if (addEntry.cvc == "Yes"){
+    if (addEntry.cvc == "Yes") {
         LaunchedEffect(viewModel.selectedCVC) {
             viewModel.updateSelectedCVC(true)
         }
     }
-    if (addEntry.regionalId != null){
+    if (addEntry.regionalId != null) {
         LaunchedEffect(viewModel.selectedRegional) {
             viewModel.updateSelectedRegional(true)
         }
     }
     Column(
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.padding(10.dp)
     ) {
         if (viewModel.residentView.value) {
@@ -161,8 +155,7 @@ fun AddEditForm(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 label = {
                     Text(
-                        text = stringResource(R.string.age),
-                        style = SmallHeadingStyle
+                        text = stringResource(R.string.age), style = SmallHeadingStyle
                     )
                 },
             )
@@ -175,11 +168,9 @@ fun AddEditForm(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 label = {
                     Text(
-                        text = stringResource(R.string.quantity),
-                        style = SmallHeadingStyle
+                        text = stringResource(R.string.quantity), style = SmallHeadingStyle
                     )
-                }
-            )
+                })
         } else {
             OutlinedTextField(
                 value = addEntry.asa,
@@ -190,8 +181,7 @@ fun AddEditForm(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 label = {
                     Text(
-                        text = stringResource(R.string.asa),
-                        style = SmallHeadingStyle
+                        text = stringResource(R.string.asa), style = SmallHeadingStyle
                     )
                 },
             )
@@ -200,34 +190,32 @@ fun AddEditForm(
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = stringResource(R.string.clinical),
+                    text = stringResource(R.string.aline),
                     style = SmallHeadingStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
-                Spacer(modifier = Modifier.padding(end = 20.dp))
+                Spacer(modifier = Modifier.weight(1f))
                 Switch(
-                    checked = viewModel.selectedClinical.value,
-                    onCheckedChange = {
-                        if (it) {
-                            addEntry.clinical = "Yes"
-                        } else {
-                            addEntry.clinical = "No"
-                        }
-                        viewModel.updateSelectedClinical(it)
-                    },
-                    thumbContent = if (viewModel.selectedClinical.value) {
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                            )
-                        }
+                    checked = viewModel.selectedClinical.value, onCheckedChange = {
+                    if (it) {
+                        addEntry.clinical = "Yes"
                     } else {
-                        null
+                        addEntry.clinical = "No"
                     }
-                )
+                    viewModel.updateSelectedClinical(it)
+                }, thumbContent = if (viewModel.selectedClinical.value) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                        )
+                    }
+                } else {
+                    null
+                })
             }
+            Spacer(Modifier.height(10.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -237,117 +225,100 @@ fun AddEditForm(
                     style = SmallHeadingStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
-                Spacer(modifier = Modifier.padding(end = 20.dp))
+                Spacer(modifier = Modifier.weight(1f))
                 Switch(
-                    checked = viewModel.selectedCVC.value,
-                    onCheckedChange = {
-                        if (it){
-                            addEntry.cvc = "Yes"
-                        } else {
-                            addEntry.cvc = "No"
-                        }
-                        viewModel.updateSelectedCVC(it)
-                    },
-                    thumbContent = if (viewModel.selectedCVC.value) {
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                            )
-                        }
+                    checked = viewModel.selectedCVC.value, onCheckedChange = {
+                    if (it) {
+                        addEntry.cvc = "Yes"
                     } else {
-                        null
+                        addEntry.cvc = "No"
                     }
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-            ) {
-                Text(
-                    text = stringResource(R.string.regional),
-                    style = SmallHeadingStyle,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-                Spacer(modifier = Modifier.padding(end = 20.dp))
-                Switch(
-                    checked = viewModel.selectedRegional.value,
-                    onCheckedChange = {
-                        viewModel.updateSelectedRegional(it)
-                    },
-                    thumbContent = if (viewModel.selectedRegional.value) {
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                            )
-                        }
-                    } else {
-                        null
+                    viewModel.updateSelectedCVC(it)
+                }, thumbContent = if (viewModel.selectedCVC.value) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                        )
                     }
-                )
-            }
-            if (viewModel.selectedRegional.value){
-                DropdownRegional(
-                    items = regionalUiState.types,
-                    label = stringResource(R.string.regional_type),
-                    addEntry,
-                    viewModel
-                )
+                } else {
+                    null
+                })
             }
         }
-
+        Spacer(Modifier.height(10.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.Start,
         ) {
             Text(
-                text = stringResource(R.string.gender),
+                text = stringResource(R.string.regional),
                 style = SmallHeadingStyle,
                 modifier = Modifier.padding(start = 10.dp)
             )
-            radioOptions.forEach { text ->
-                Row(
-                    Modifier
-                        .height(56.dp)
-                        .selectable(
-                            selected = (text == viewModel.selectedGender.value),
-                            onClick = {
-                                addEntry.gender = text
-                                viewModel.updateSelectedGender(text)
-                            },
-                            role = Role.RadioButton
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(
+                checked = viewModel.selectedRegional.value, onCheckedChange = {
+                    viewModel.updateSelectedRegional(it)
+                }, thumbContent = if (viewModel.selectedRegional.value) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
                         )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (text == viewModel.selectedGender.value),
-                        onClick = null
-                    )
-                    Text(
-                        text = text,
-                        style = SmallHeadingStyle,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
+                    }
+                } else {
+                    null
+                })
+        }
+        if (viewModel.selectedRegional.value) {
+            Spacer(Modifier.height(10.dp))
+            DropdownRegional(
+                items = regionalUiState.types,
+                label = stringResource(R.string.regional_type),
+                addEntry,
+                viewModel
+            )
+        }
+        if (viewModel.residentView.value) {
+            Spacer(Modifier.height(10.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = stringResource(R.string.gender),
+                    style = SmallHeadingStyle,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+                radioOptions.forEach { text ->
+                    Row(
+                        Modifier
+                            .height(56.dp)
+                            .selectable(
+                                selected = (text == viewModel.selectedGender.value), onClick = {
+                                    addEntry.gender = text
+                                    viewModel.updateSelectedGender(text)
+                                }, role = Role.RadioButton
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (text == viewModel.selectedGender.value), onClick = null
+                        )
+                        Text(
+                            text = text,
+                            style = SmallHeadingStyle,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
                 }
             }
         }
-
-        OutlinedTextField(
-            value = addEntry.notes,
-            onValueChange = { onValueChange(addEntry.copy(notes = it)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = true,
-            label = {
-                Text(
-                    text = stringResource(R.string.notes),
-                    style = SmallHeadingStyle
-                )
-            }
-        )
+        Spacer(Modifier.height(10.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -359,8 +330,7 @@ fun AddEditForm(
                 enabled = true,
                 label = {
                     Text(
-                        text = stringResource(R.string.date),
-                        style = SmallHeadingStyle
+                        text = stringResource(R.string.date), style = SmallHeadingStyle
                     )
                 },
                 trailingIcon = {
@@ -372,17 +342,14 @@ fun AddEditForm(
                             onDateSelected = {
                                 viewModel.updateSelectedDate(it)
                                 addEntry.entryDate = it
-                            }
-                        )
+                            })
                     }) {
                         Icon(
                             imageVector = Icons.Outlined.DateRange,
                             contentDescription = stringResource(R.string.date)
                         )
                     }
-                }
-            )
-
+                })
         }
         Spacer(Modifier.height(10.dp))
         Dropdown(
@@ -391,11 +358,21 @@ fun AddEditForm(
             addEntry,
             viewModel
         )
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(10.dp))
+        OutlinedTextField(
+            value = addEntry.notes,
+            onValueChange = { onValueChange(addEntry.copy(notes = it)) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = true,
+            label = {
+                Text(
+                    text = stringResource(R.string.notes), style = SmallHeadingStyle
+                )
+            })
+        Spacer(Modifier.height(10.dp))
         if (viewModel.action == Constants.ADD) {
             Button(
-                enabled = isButtonEnabled,
-                onClick = {
+                enabled = isButtonEnabled, onClick = {
                     viewModel.saveEntry()
                     navController.navigate(NavigationDestinations.Summary.name)
                 }, modifier = Modifier
@@ -406,8 +383,7 @@ fun AddEditForm(
             }
         } else if (viewModel.action == Constants.EDIT) {
             Button(
-                enabled = isButtonEnabled,
-                onClick = {
+                enabled = isButtonEnabled, onClick = {
                     viewModel.updateEntry()
                     navController.navigate(NavigationDestinations.Entries.name)
                 }, modifier = Modifier
@@ -424,10 +400,7 @@ fun AddEditForm(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownRegional(
-    items: List<RegionalType>,
-    label: String,
-    addEntry: AddEntry,
-    viewModel: AddEntryViewModel
+    items: List<RegionalType>, label: String, addEntry: AddEntry, viewModel: AddEntryViewModel
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
@@ -473,8 +446,11 @@ fun DropdownRegional(
             },
         )
 
-        val filteredOptions =
-            items.filter { it.name.contains(viewModel.selectedRegionalType.value, ignoreCase = true) }
+        val filteredOptions = items.filter {
+            it.name.contains(
+                viewModel.selectedRegionalType.value, ignoreCase = true
+            )
+        }
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { },
@@ -507,60 +483,52 @@ fun DropdownRegional(
                     }
                 }
             }
-            if (openDialog)
-                AlertDialog(
-                    shape = RoundedCornerShape(25.dp),
-                    onDismissRequest = { openDialog = false },
-                    title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
-                    text = {
-                        OutlinedTextField(
-                            value = regionalType,
-                            onValueChange = { regionalType = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = true,
-                            label = {
-                                Text(
-                                    text = stringResource(id = R.string.regional_type),
-                                    style = SmallHeadingStyle
-                                )
-                            }
-                        )
-                    },
-                    confirmButton = {
-                        Button(
-                            shape = RoundedCornerShape(25.dp),
-                            onClick = {
-                                try {
-                                    viewModel.addRegionalType(regionalType)
-                                    openDialog = false
-                                } catch (e: Exception) {
-                                    Toast.makeText(
-                                        context,
-                                        "Something went wrong.",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            },
-                        ) {
+            if (openDialog) AlertDialog(
+                shape = RoundedCornerShape(25.dp),
+                onDismissRequest = { openDialog = false },
+                title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
+                text = {
+                    OutlinedTextField(
+                        value = regionalType,
+                        onValueChange = { regionalType = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true,
+                        label = {
                             Text(
-                                stringResource(R.string.save),
+                                text = stringResource(id = R.string.regional_type),
                                 style = SmallHeadingStyle
                             )
-                        }
-                    },
-                    dismissButton = {
-                        Button(
-                            shape = RoundedCornerShape(25.dp),
-                            onClick = {
+                        })
+                },
+                confirmButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
+                        onClick = {
+                            try {
+                                viewModel.addRegionalType(regionalType)
                                 openDialog = false
-                            }) {
-                            Text(
-                                stringResource(R.string.cancel),
-                                style = SmallHeadingStyle
-                            )
-                        }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context, "Something went wrong.", Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        },
+                    ) {
+                        Text(
+                            stringResource(R.string.save), style = SmallHeadingStyle
+                        )
                     }
-                )
+                },
+                dismissButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp), onClick = {
+                            openDialog = false
+                        }) {
+                        Text(
+                            stringResource(R.string.cancel), style = SmallHeadingStyle
+                        )
+                    }
+                })
 
         }
     }
@@ -569,10 +537,7 @@ fun DropdownRegional(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownAttending(
-    items: List<Attending>,
-    label: String,
-    addEntry: AddEntry,
-    viewModel: AddEntryViewModel
+    items: List<Attending>, label: String, addEntry: AddEntry, viewModel: AddEntryViewModel
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
@@ -652,60 +617,52 @@ fun DropdownAttending(
                     }
                 }
             }
-            if (openDialog)
-                AlertDialog(
-                    shape = RoundedCornerShape(25.dp),
-                    onDismissRequest = { openDialog = false },
-                    title = { Text(stringResource(R.string.add_attending_confirmation_title)) },
-                    text = {
-                        OutlinedTextField(
-                            value = attendingName,
-                            onValueChange = { attendingName = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = true,
-                            label = {
-                                Text(
-                                    text = stringResource(id = R.string.attending),
-                                    style = SmallHeadingStyle
-                                )
-                            }
-                        )
-                    },
-                    confirmButton = {
-                        Button(
-                            shape = RoundedCornerShape(25.dp),
-                            onClick = {
-                                try {
-                                    viewModel.addAttending(attendingName)
-                                    openDialog = false
-                                } catch (e: Exception) {
-                                    Toast.makeText(
-                                        context,
-                                        "Something went wrong.",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            },
-                        ) {
+            if (openDialog) AlertDialog(
+                shape = RoundedCornerShape(25.dp),
+                onDismissRequest = { openDialog = false },
+                title = { Text(stringResource(R.string.add_attending_confirmation_title)) },
+                text = {
+                    OutlinedTextField(
+                        value = attendingName,
+                        onValueChange = { attendingName = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true,
+                        label = {
                             Text(
-                                stringResource(R.string.save),
+                                text = stringResource(id = R.string.attending),
                                 style = SmallHeadingStyle
                             )
-                        }
-                    },
-                    dismissButton = {
-                        Button(
-                            shape = RoundedCornerShape(25.dp),
-                            onClick = {
+                        })
+                },
+                confirmButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
+                        onClick = {
+                            try {
+                                viewModel.addAttending(attendingName)
                                 openDialog = false
-                            }) {
-                            Text(
-                                stringResource(R.string.cancel),
-                                style = SmallHeadingStyle
-                            )
-                        }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context, "Something went wrong.", Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        },
+                    ) {
+                        Text(
+                            stringResource(R.string.save), style = SmallHeadingStyle
+                        )
                     }
-                )
+                },
+                dismissButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp), onClick = {
+                            openDialog = false
+                        }) {
+                        Text(
+                            stringResource(R.string.cancel), style = SmallHeadingStyle
+                        )
+                    }
+                })
 
         }
     }
@@ -714,10 +671,7 @@ fun DropdownAttending(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dropdown(
-    items: List<Type>,
-    label: String,
-    addEntry: AddEntry,
-    viewModel: AddEntryViewModel
+    items: List<Type>, label: String, addEntry: AddEntry, viewModel: AddEntryViewModel
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
@@ -785,8 +739,7 @@ fun Dropdown(
                 IconButton(onClick = { openDialog = true }, Modifier.width(175.dp)) {
                     Row {
                         Icon(
-                            imageVector = Icons.Outlined.Add,
-                            contentDescription = stringResource(
+                            imageVector = Icons.Outlined.Add, contentDescription = stringResource(
                                 id = R.string.add
                             )
                         )
@@ -798,74 +751,62 @@ fun Dropdown(
                     }
                 }
             }
-            if (openDialog)
-                AlertDialog(
-                    shape = RoundedCornerShape(25.dp),
-                    onDismissRequest = { openDialog = false },
-                    title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
-                    text = {
-                        OutlinedTextField(
-                            value = procedureType,
-                            onValueChange = { procedureType = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = true,
-                            label = {
-                                Text(
-                                    text = stringResource(id = R.string.procedure_type),
-                                    style = SmallHeadingStyle
-                                )
-                            }
+            if (openDialog) AlertDialog(
+                shape = RoundedCornerShape(25.dp),
+                onDismissRequest = { openDialog = false },
+                title = { Text(stringResource(R.string.add_new_type_confirmation_title)) },
+                text = {
+                    OutlinedTextField(
+                        value = procedureType,
+                        onValueChange = { procedureType = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true,
+                        label = {
+                            Text(
+                                text = stringResource(id = R.string.procedure_type),
+                                style = SmallHeadingStyle
+                            )
+                        })
+                },
+                confirmButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp),
+                        onClick = {
+                            viewModel.addType(procedureType)
+                            openDialog = false
+                        },
+                    ) {
+                        Text(
+                            stringResource(R.string.save), style = SmallHeadingStyle
                         )
-                    },
-                    confirmButton = {
-                        Button(
-                            shape = RoundedCornerShape(25.dp),
-                            onClick = {
-                                viewModel.addType(procedureType)
-                                openDialog = false
-                            },
-                        ) {
-                            Text(
-                                stringResource(R.string.save),
-                                style = SmallHeadingStyle
-                            )
-                        }
-                    },
-                    dismissButton = {
-                        Button(
-                            shape = RoundedCornerShape(25.dp),
-                            onClick = {
-                                openDialog = false
-                            }) {
-                            Text(
-                                stringResource(R.string.cancel),
-                                style = SmallHeadingStyle
-                            )
-                        }
                     }
-                )
+                },
+                dismissButton = {
+                    Button(
+                        shape = RoundedCornerShape(25.dp), onClick = {
+                            openDialog = false
+                        }) {
+                        Text(
+                            stringResource(R.string.cancel), style = SmallHeadingStyle
+                        )
+                    }
+                })
         }
     }
 }
 
 private fun showDatePicker(
-    date: Calendar,
-    context: Context,
-    onDateSelected: (Long) -> Unit
+    date: Calendar, context: Context, onDateSelected: (Long) -> Unit
 ) {
 
     val tempDate = Calendar.getInstance()
     val datePicker = android.app.DatePickerDialog(
-        context,
-        { _, year, month, day ->
+        context, { _, year, month, day ->
             tempDate[Calendar.YEAR] = year
             tempDate[Calendar.MONTH] = month
             tempDate[Calendar.DAY_OF_MONTH] = day
             onDateSelected(tempDate.timeInMillis)
-        },
-        date[Calendar.YEAR],
-        date[Calendar.MONTH],
-        date[Calendar.DAY_OF_MONTH]
+        }, date[Calendar.YEAR], date[Calendar.MONTH], date[Calendar.DAY_OF_MONTH]
     )
     datePicker.show()
 }
