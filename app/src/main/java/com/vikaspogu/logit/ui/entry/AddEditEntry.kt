@@ -273,15 +273,6 @@ fun AddEditForm(
                     null
                 })
         }
-        if (viewModel.selectedRegional.value) {
-            Spacer(Modifier.height(10.dp))
-            DropdownRegional(
-                items = regionalUiState.types,
-                label = stringResource(R.string.regional_type),
-                addEntry,
-                viewModel
-            )
-        }
         if (viewModel.residentView.value) {
             Spacer(Modifier.height(10.dp))
             Row(
@@ -358,6 +349,15 @@ fun AddEditForm(
             addEntry,
             viewModel
         )
+        if (viewModel.selectedRegional.value) {
+            Spacer(Modifier.height(10.dp))
+            DropdownRegional(
+                items = regionalUiState.types,
+                label = stringResource(R.string.regional_type),
+                addEntry,
+                viewModel
+            )
+        }
         Spacer(Modifier.height(10.dp))
         OutlinedTextField(
             value = addEntry.notes,
